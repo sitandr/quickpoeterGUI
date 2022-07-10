@@ -1,0 +1,33 @@
+div.editor {
+	overflow: auto;
+	scroll-behavior: smooth;
+	height: 100vh;
+    padding: 5px;
+	outline: none;
+	background: hsl(100, 0%, 20%);
+    color: 		hsl(  0, 0%, 80%);
+    font-size: 2em;
+    font-family: monospace;
+}
+
+input.user_input {
+	-webkit-app-region: no-drag;
+	margin: 10px;
+	height: 30px;
+}
+
+div.output {
+	-webkit-app-region: no-drag;
+	margin: 5px;
+	white-space: pre-wrap;
+}
+
+body{
+	-ms-overflow-style: scrollbar;
+	-webkit-app-region: drag;
+}
+
+span{
+    border-radius: 5px;
+	/* background: hsl(0, 0%, 100%); */
+}
