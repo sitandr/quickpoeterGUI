@@ -3,6 +3,8 @@
 
 // With the Tauri global script, enabled when `tauri.conf.json > build > withGlobalTauri` is set to true:
 const invoke = window.__TAURI__.invoke;
+const WORD = /(?=([а-яё]*))\1/gi;
+const SYLL = /(?=([аоэуыюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
 
 //0        Т С   Ч
 //1 РЛНМ П     Ш
@@ -44,53 +46,124 @@ assonanses = {
 
 alliteration = {
 	"О": "hsl(0, 80%, 70%)",
+	"Ё": "hsl(0, 80%, 70%)",
 	"А": "hsl(30, 80%, 70%)",
+	"Я": "hsl(30, 80%, 70%)",
 	"Э": "hsl(60, 80%, 70%)",
+	"Е": "hsl(60, 80%, 70%)",
 	"У": "hsl(140, 80%, 70%)",
+	"Ю": "hsl(140, 80%, 70%)",
 	"И": "hsl(-80, 80%, 70%)",
 	"Ы": "hsl(-50, 80%, 70%)",
 }
 
-class Colorifier{
-	static colorify_assonanses(text){
-		return new Promise(function(resolve, reject){
-			let colors = [];
-			for (let i=0; i<text.length; i++){
-				let line = text[i];
-				colors.push([]);
-				for (let j=0; j<line.length; j++){
-					let l = line[j].toUpperCase();
-					if (l in assonanses){
-						colors[i].push(assonanses[l]);
-					}
-					else{
-						colors[i].push("inherit");
-					}
-				}
-			}
-			resolve(colors);
-		});
-	}
+PRIMARY_STRESS = "hsl(70, 80%, 70%)"
+SECONDARY_STRESS = "hsl(45, 80%, 70%)"
+NO_STRESS = "hsl(140, 80%, 70%)"
+UNKNOWN_STRESS = "hsl(-80, 80%, 70%)"
 
-	static colorify_alliteration(text){
+
+function makeSingle(generator) { // function copied from some site to cancel not actual calls of async
+  let globalNonce;
+  return async function(...args) {
+    const localNonce = globalNonce = new Object();
+
+    const iter = generator(...args);
+    let resumeValue;
+    for (;;) {
+      console.log(iter, args);
+
+      const n = iter.next(resumeValue);
+
+      // whatever the generator yielded, _now_ run await on it
+      resumeValue = await n.value;
+      if (localNonce !== globalNonce) {
+        return;  // a new call was made
+      }
+
+	  if (n.done) {
+        return n.value;  // final return value of passed generator
+      }
+      // next loop, we give resumeValue back to the generator
+    }
+  };
+}
+
+
+class Colorifier{
+	static colorify_assonanses = makeSingle(function*(text){
 		let colors = [];
 		for (let i=0; i<text.length; i++){
 			let line = text[i];
-			colors.push([]);
+			colors.push(new Array(line.length).fill("inherit"));
 			for (let j=0; j<line.length; j++){
 				let l = line[j].toUpperCase();
-				if (l in alliteration){
-					colors[i].push(alliteration[l]);
-				}
-				else{
-					colors[i].push("inherit");
+				if (l in assonanses){
+					colors[i][j] = assonanses[l];
 				}
 			}
 		}
 		return colors;
-	}
+	});
 
-	static colorify_stresses(text){
+	static colorify_alliteration = makeSingle(function*(text){
+		let colors = [];
+		for (let i=0; i<text.length; i++){
+			let line = text[i];
+			colors.push(new Array(line.length).fill("inherit"));
+			for (let j=0; j<line.length; j++){
+				let l = line[j].toUpperCase();
+				if (l in alliteration){
+					colors[i][j] = alliteration[l];
+				}
+			}
+		}
+		return colors;
+	});
 
-	}
+	static colorify_stresses = makeSingle(function*(text){
+		let colors = [];
+		for (let i=0; i<text.length; i++){
+			let line = text[i];
+			colors.push(new Array(line.length).fill("inherit"));
+			let word_matches = line.matchAll(WORD);
+
+			for (const match of word_matches){
+				let word = match[0];
+
+				if (word.length == 0){
+					continue;
+				}
+
+				console.log(word);
+
+				let sylls = word.match(SYLL);
+				console.assert(sylls != null);
+				let stresses = yield invoke("find_stresses", {"word": word});
+				
+
+				let c_lett_num = match.index;
+				for (let j=0; j<sylls.length; j++){
+					let col = NO_STRESS;
+					if (stresses == null){
+						col = UNKNOWN_STRESS;
+					}
+					else if (j == stresses[0]){
+						col = PRIMARY_STRESS;
+					}
+					else if (stresses[1].includes(j)){
+						col = SECONDARY_STRESS;
+					}
+
+					colors[i][c_lett_num] = col;
+					c_lett_num += sylls[j].length;
+				}
+			} 
+		}
+		return colors;
+	});
 }
+
+/*Colorifier.colorify_assonanses = makeSingle(Colorifier.colorify_assonanses);
+Colorifier.colorify_alliteration = makeSingle(Colorifier.colorify_assonanses);
+Colorifier.colorify_stresses = makeSingle(Colorifier.colorify_assonanses);*/

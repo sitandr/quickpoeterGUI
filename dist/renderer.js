@@ -11,7 +11,7 @@ let readClipText = window.__TAURI__.clipboard.readText;
 
 
 // Invoke the command
-
+invoke("load_data").then(() => console.log("Loaded"));
 
 class colorEditor{
     
@@ -35,7 +35,6 @@ class colorEditor{
                 if (self.history.length){
                     self.text = self.history.pop();
                     self.editorUPD();
-                    console.log(e)
                 }
             }
         }
@@ -92,7 +91,7 @@ class colorEditor{
                 break
 
                 default:
-                    console.log(e);
+                    console.log("Unknown event:", e);
             }
             self.editorUPD();
             });
@@ -113,7 +112,6 @@ class colorEditor{
     }
 
     insertPlainText(addedText){
-        console.log(addedText);
         addedText.replace(' ', ' ');
         let splitted = addedText.split('\n');
 
@@ -266,8 +264,13 @@ class colorEditor{
                 this.safeSelectionAt(div, 0);
             }
         }
-
-        Colorifier.colorify_assonanses(this.text).then((colors) => {
+        // colorify_stresses
+        // colorify_assonanses
+        // colorify_alliteration
+        Colorifier.colorify_stresses(this.text).then((colors) => {
+            if (colors == undefined){
+                return;
+            }
             for (let lineNum = 0; lineNum < this.text.length; lineNum ++){
                 let line = this.text[lineNum];
                 for (let charNum = 0; charNum < line.length; charNum ++){
