@@ -44,7 +44,10 @@ class colorEditor{
             let sel = window.getSelection();
             if (sel){
                 let r = sel.getRangeAt(0);
-                self.getCoord(r.startContainer);
+                self.getCoord(r.startContainer, true);
+                if (r.startOffset == 0){
+                    self.cursorSymbol = 0;
+                } 
                 //self.cursorSymbol += r.startOffset - 1;
             }
             
@@ -52,7 +55,7 @@ class colorEditor{
             let text = [""];
             self.history.push(self.text.slice(0));
 
-            if (self.history.lentgh > 50){
+            if (self.history.length > 50){
                 self.history.shift();
             }
 
@@ -63,11 +66,14 @@ class colorEditor{
                 break
 
                 case "insertFromPaste":
-                    text = readClipText().then((text) => self.insertOrReplaceText(text));
+                    text = readClipText().then((text) => {
+                        self.insertOrReplaceText(text);
+                        self.editorUPD();
+                    });
                     e.preventDefault();
                 break
 
-                case "insertParagraph":
+                case "insertParagraph": //TODO: FIX BREAK AT START OF THE LINE
                     self.insertBreak();
                     e.preventDefault();
                 break
@@ -93,6 +99,7 @@ class colorEditor{
                 default:
                     console.log("Unknown event:", e);
             }
+            console.log(self.cursorSymbol);
             self.editorUPD();
             });
     }
@@ -139,8 +146,9 @@ class colorEditor{
 
     insertBreak(){
         // breakline
-        this.text.splice(this.cursorLine + 1, 0, this.text[this.cursorLine].substr(this.cursorSymbol));
-        this.text[this.cursorLine] = this.text[this.cursorLine].substr(0, this.cursorSymbol);
+        console.log(this.cursorSymbol);
+        this.text.splice(this.cursorLine + 1, 0, this.text[this.cursorLine].substr(this.cursorSymbol)); // insert cursorSymb:… to a new line
+        this.text[this.cursorLine] = this.text[this.cursorLine].substr(0, this.cursorSymbol); // cut this line
 
         this.cursorLine += 1;
         this.cursorSymbol = 0;
@@ -283,7 +291,7 @@ class colorEditor{
         });
     }
 
-    getCoord(obj, autoset = true){
+    getCoord(obj, autoset=true){
         // if autoset, sets current position here. At any case returns cursor position.
         let cursorSymb;
         let cursorLine;
@@ -299,7 +307,6 @@ class colorEditor{
         else{
             cursorSymb = 0;
         }
-
         
 
         cursorLine = Array.from(obj.parentNode.childNodes).indexOf(obj);

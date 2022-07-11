@@ -4,7 +4,8 @@
 // With the Tauri global script, enabled when `tauri.conf.json > build > withGlobalTauri` is set to true:
 const invoke = window.__TAURI__.invoke;
 const WORD = /(?=([а-яё]*))\1/gi;
-const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
+//const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
+const VOWEL = /[аоэуыиюеёюя]/gi;
 
 //0        Т С   Ч
 //1 РЛНМ П     Ш
@@ -57,10 +58,12 @@ alliteration = {
 	"Ы": "hsl(-50, 80%, 70%)",
 }
 
-PRIMARY_STRESS = "hsl(70, 80%, 70%)"
-SECONDARY_STRESS = "hsl(45, 80%, 70%)"
-NO_STRESS = "hsl(140, 80%, 70%)"
-UNKNOWN_STRESS = "hsl(-80, 80%, 70%)"
+PRIMARY_STRESS = "hsl(70, 80%, 70%)";
+SECONDARY_STRESS = "hsl(10, 80%, 70%)";
+NO_STRESS = "hsl(150, 70%, 50%)";
+UNKNOWN_STRESS = "hsl(-80, 80%, 70%)";
+
+let cashed_stresses = {};
 
 
 function makeSingle(generator) { // function copied from some site to cancel not actual calls of async
@@ -85,6 +88,14 @@ function makeSingle(generator) { // function copied from some site to cancel not
       // next loop, we give resumeValue back to the generator
     }
   };
+}
+
+async function get_stresses(word){
+	word = word.toLowerCase();
+	if (!(word in cashed_stresses)){
+		cashed_stresses[word] = await invoke("find_stresses", {"word": word});
+	}
+	return cashed_stresses[word];
 }
 
 
@@ -133,22 +144,18 @@ class Colorifier{
 					continue;
 				}
 
-				let sylls = word.match(SYLL);
-				let stresses = yield invoke("find_stresses", {"word": word.toLowerCase()});
-				
+				let stresses = yield get_stresses(word);
+				let vowels = Array.from(word.matchAll(VOWEL));
+				let j = 0;
 
-				let c_lett_num = match.index;
-				for (let j=0; j<sylls.length; j++){
-					if (sylls[j].length == 0){
-						continue;
-					}
+				for (const v_match of vowels){
+					let v = v_match[0];
 
-					if (!(sylls[j][0].toUpperCase() in alliteration)){
-						c_lett_num += sylls[j].length;
-						continue;
-					}
 					let col = NO_STRESS;
-					if (stresses == null){
+					if (vowels.length == 1){
+						col = SECONDARY_STRESS;
+					}
+					else if (stresses == null){
 						col = UNKNOWN_STRESS;
 					}
 					else if (j == stresses[0]){
@@ -158,8 +165,9 @@ class Colorifier{
 						col = SECONDARY_STRESS;
 					}
 
+					let c_lett_num = match.index + v_match.index;
 					colors[i][c_lett_num] = col;
-					c_lett_num += sylls[j].length;
+					j++;
 				}
 			} 
 		}
