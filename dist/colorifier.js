@@ -4,7 +4,7 @@
 // With the Tauri global script, enabled when `tauri.conf.json > build > withGlobalTauri` is set to true:
 const invoke = window.__TAURI__.invoke;
 const WORD = /(?=([а-яё]*))\1/gi;
-const SYLL = /(?=([аоэуыюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
+const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
 
 //0        Т С   Ч
 //1 РЛНМ П     Ш
@@ -71,8 +71,6 @@ function makeSingle(generator) { // function copied from some site to cancel not
     const iter = generator(...args);
     let resumeValue;
     for (;;) {
-      console.log(iter, args);
-
       const n = iter.next(resumeValue);
 
       // whatever the generator yielded, _now_ run await on it
@@ -135,15 +133,20 @@ class Colorifier{
 					continue;
 				}
 
-				console.log(word);
-
 				let sylls = word.match(SYLL);
-				console.assert(sylls != null);
-				let stresses = yield invoke("find_stresses", {"word": word});
+				let stresses = yield invoke("find_stresses", {"word": word.toLowerCase()});
 				
 
 				let c_lett_num = match.index;
 				for (let j=0; j<sylls.length; j++){
+					if (sylls[j].length == 0){
+						continue;
+					}
+
+					if (!(sylls[j][0].toUpperCase() in alliteration)){
+						c_lett_num += sylls[j].length;
+						continue;
+					}
 					let col = NO_STRESS;
 					if (stresses == null){
 						col = UNKNOWN_STRESS;
