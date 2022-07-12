@@ -9,10 +9,24 @@ String.prototype.insertAt = function(index, string)
 let editor = document.getElementsByClassName("editor")[0];
 let readClipText = window.__TAURI__.clipboard.readText;
 
+let cur_but = document.getElementsByClassName("current_but")[0];
+let choice_but = document.getElementsByClassName("choice_but")[0];
+let status_bar = document.getElementsByClassName("status")[0];
 
 // Invoke the command
-invoke("load_data").then(() => console.log("Loaded"));
+invoke("load_data").then(() => {status_bar.firstChild.data ="Loaded data"});
 
+cur_but.onclick = function (e){
+    if (choice_but.style.visibility == "hidden"){
+        choice_but.style.visibility = "inherit"
+    }
+    else{
+        choice_but.style.visibility = "hidden"
+    }
+}
+
+
+// TODO: Сохранение прокрутки
 class colorEditor{
     
 
@@ -23,6 +37,7 @@ class colorEditor{
         this.cursorLine = 0;
         this.cursorSymbol = 0;
         this.history = [];
+        this.colorify_func = Colorifier.colorify_assonanses;
 
         this.widgets = null;
 
@@ -146,7 +161,6 @@ class colorEditor{
 
     insertBreak(){
         // breakline
-        console.log(this.cursorSymbol);
         this.text.splice(this.cursorLine + 1, 0, this.text[this.cursorLine].substr(this.cursorSymbol)); // insert cursorSymb:… to a new line
         this.text[this.cursorLine] = this.text[this.cursorLine].substr(0, this.cursorSymbol); // cut this line
 
@@ -275,7 +289,7 @@ class colorEditor{
         // colorify_stresses
         // colorify_assonanses
         // colorify_alliteration
-        Colorifier.colorify_stresses(this.text).then((colors) => {
+        this.colorify_func(this.text).then((colors) => {
             if (colors == undefined){
                 return;
             }
@@ -346,3 +360,25 @@ function getRandomColor() {
 
 
 let ed = new colorEditor(editor);
+
+let asson_but = document.getElementById("asson_but");
+let allit_but = document.getElementById("allit_but");
+let stress_but = document.getElementById("stress_but");
+
+asson_but.onclick = (e) => {
+    ed.colorify_func = Colorifier.colorify_assonanses;
+    ed.editorUPD();
+    cur_but.firstChild.data = "Ассонансы";
+};
+
+allit_but.onclick = (e) => {
+    ed.colorify_func = Colorifier.colorify_alliteration;
+    ed.editorUPD();
+    cur_but.firstChild.data = "Аллитерация";
+};
+
+stress_but.onclick = (e) => {
+    ed.colorify_func = Colorifier.colorify_stresses;
+    ed.editorUPD();
+    cur_but.firstChild.data = "Ударения";
+};

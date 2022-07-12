@@ -1,7 +1,7 @@
 div.editor {
 	overflow: auto;
 	scroll-behavior: smooth;
-	height: 100vh;
+	height: 93vh;
     padding: 5px;
 	outline: none;
 	background: hsl(100, 0%, 20%);
@@ -10,6 +10,10 @@ div.editor {
     font-family: monospace;
 }
 
+.editor>div {
+	padding: 3px;
+}
+/*
 input.user_input {
 	-webkit-app-region: no-drag;
 	margin: 10px;
@@ -20,7 +24,7 @@ div.output {
 	-webkit-app-region: no-drag;
 	margin: 5px;
 	white-space: pre-wrap;
-}
+}*/
 
 body{
 	-ms-overflow-style: scrollbar;
@@ -31,4 +35,44 @@ body{
 span{
     border-radius: 5px;
 	/* background: hsl(0, 0%, 100%); */
+}
+
+footer{
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 6vh;
+    background-color: hsl(0,0%,30%);
+    color: hsl( 0, 0%, 80%);
+    font-family: monospace;
+    font-size: 1.5em;
+}
+
+footer>.status{
+    display: inline-block;
+    padding: 3px;
+}
+
+footer>.buttons{
+    float: right;
+    padding: 0px;
+}
+
+footer .buttons .choice_but{
+	list-style: none;
+	position: absolute;
+	margin: 0px 0px 0px 0;
+	padding: 0px;
+	bottom: 100%;
+	visibility: hidden;
+}
+
+footer .buttons button{
+    float: right;
+    padding: 5px;
+    color: hsl(0, 0%, 20%);
+    background: hsl(20, 20%, 80%);
+    border-width: 0px;
+    font-size: 0.7em;
+    font-family: monospace;
 }
