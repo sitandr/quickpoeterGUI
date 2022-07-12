@@ -53,6 +53,15 @@ footer>.status{
     padding: 3px;
 }
 
+footer input.finder {
+    background: hsl(100, 0%, 20%);
+    height: 50%;
+    color: hsl( 0, 0%, 80%);
+    font-family: monospace;
+    font-size: 1em;
+    margin-left: 20px;
+    width: 20%;
+}
 footer>.buttons{
     float: right;
     padding: 0px;

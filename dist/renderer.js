@@ -14,7 +14,10 @@ let choice_but = document.getElementsByClassName("choice_but")[0];
 let status_bar = document.getElementsByClassName("status")[0];
 
 // Invoke the command
-invoke("load_data").then(() => {status_bar.firstChild.data ="Loaded data"});
+invoke("load_data").then(() => {
+    //status_bar.firstChild.data ="Loaded data"
+    status_bar.style.visibility = "hidden";
+});
 
 cur_but.onclick = function (e){
     if (choice_but.style.visibility == "hidden"){
