@@ -56,22 +56,30 @@ footer>.status{
 footer>.buttons{
     float: right;
     padding: 0px;
+    margin-right: 30px;
+    display: flex;
+    max-block-size: -webkit-fill-available;
+    flex-direction: column-reverse;
 }
 
 footer .buttons .choice_but{
-	list-style: none;
-	position: absolute;
-	margin: 0px 0px 0px 0;
-	padding: 0px;
-	bottom: 100%;
-	visibility: hidden;
+	display: flex;
+    flex-direction: column-reverse;
+    visibility: hidden;
+}
+
+footer .current_but{
+	background: hsl(-20, 50%, 70%);
+}
+
+footer .buttons .choice_but button{
+	background: hsl(20, 20%, 80%);
 }
 
 footer .buttons button{
-    float: right;
     padding: 5px;
     color: hsl(0, 0%, 20%);
-    background: hsl(20, 20%, 80%);
+    
     border-width: 0px;
     font-size: 0.7em;
     font-family: monospace;

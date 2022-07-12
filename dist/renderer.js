@@ -37,9 +37,10 @@ class colorEditor{
         this.cursorLine = 0;
         this.cursorSymbol = 0;
         this.history = [];
-        this.colorify_func = Colorifier.colorify_assonanses;
+        this.colorify_func = Colorifier.colorify_alliteration;
 
         this.widgets = null;
+        this.structure_mode = false;
 
         this.editorUPD();
 
@@ -55,6 +56,11 @@ class colorEditor{
         }
 
         this.editor.addEventListener('beforeinput', function(e){
+
+            if (self.structure_mode){
+                e.preventDefault();
+                return;
+            }
 
             let sel = window.getSelection();
             if (sel){
@@ -295,10 +301,29 @@ class colorEditor{
             }
             for (let lineNum = 0; lineNum < this.text.length; lineNum ++){
                 let line = this.text[lineNum];
-                for (let charNum = 0; charNum < line.length; charNum ++){
-                    this.editor.children[lineNum].children[charNum].style.background = colors[lineNum][charNum];
-                    if (colors[lineNum][charNum] != "inherit"){
-                        this.editor.children[lineNum].children[charNum].style.color = "#111"
+
+                if (this.structure_mode){ // hiding everything
+                    let offset = 0;
+                    for (let charNum = 0; charNum < line.length; charNum ++){
+                        let charInd = charNum + offset; // charInd describes the nodes; charNum — the colors/src text
+                        if (colors[lineNum][charNum] == "inherit"){
+                            this.editor.children[lineNum].children[charInd].remove();
+                            offset--;
+                        }
+                        else{
+                            this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
+                            this.editor.children[lineNum].children[charInd].firstChild.data = '  '
+                        }
+                    }
+                }
+
+                else{
+                    for (let charNum = 0; charNum < line.length; charNum ++){
+                        this.editor.children[lineNum].children[charNum].style.background = colors[lineNum][charNum];
+
+                        if (colors[lineNum][charNum] != "inherit"){
+                            this.editor.children[lineNum].children[charNum].style.color = "#111"
+                        }
                     }
                 }
             }
@@ -381,4 +406,12 @@ stress_but.onclick = (e) => {
     ed.colorify_func = Colorifier.colorify_stresses;
     ed.editorUPD();
     cur_but.firstChild.data = "Ударения";
+};
+
+document.onkeydown = (e) => {
+    if (e.key == "Alt"){
+        ed.structure_mode = !ed.structure_mode;
+        ed.editorUPD();
+        e.preventDefault();
+    }
 };

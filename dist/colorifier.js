@@ -100,7 +100,7 @@ async function get_stresses(word){
 
 
 class Colorifier{
-	static colorify_assonanses = makeSingle(function*(text){
+	static colorify_alliteration = makeSingle(function*(text){
 		let colors = [];
 		for (let i=0; i<text.length; i++){
 			let line = text[i];
@@ -115,7 +115,7 @@ class Colorifier{
 		return colors;
 	});
 
-	static colorify_alliteration = makeSingle(function*(text){
+	static colorify_assonanses = makeSingle(function*(text){
 		let colors = [];
 		for (let i=0; i<text.length; i++){
 			let line = text[i];
@@ -144,8 +144,12 @@ class Colorifier{
 					continue;
 				}
 
-				let stresses = yield get_stresses(word);
 				let vowels = Array.from(word.matchAll(VOWEL));
+				let stresses;
+				if (vowels.length > 1){
+					stresses = yield get_stresses(word);
+				}
+
 				let j = 0;
 
 				for (const v_match of vowels){
