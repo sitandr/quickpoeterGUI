@@ -20,6 +20,7 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.3", features = ["api-all"] }
 quickpoeter = { path = "../../quickpoeter/" }
 lazy_static = "1.4.0"
+ordered-float = "*"
 
 [features]
 # by default Tauri runs in production mode

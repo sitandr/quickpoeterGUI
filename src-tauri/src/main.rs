@@ -6,17 +6,25 @@
 
 use tauri::command;
 use quickpoeter::finder::{WordCollector};
+use quickpoeter::reader::MeanStrFields;
+use quickpoeter::api::{find_from_args, Args};
+
 use lazy_static::lazy_static;
 
 lazy_static! {
     static ref WC: WordCollector = WordCollector::load_default();
 }
 
-#[command]
-fn my_custom_command(l: &str) -> String{
-		let l = l.as_bytes()[0];
-		let s: String = format!("{:X}{:X}{:X}", l, l, l);
-		"#".to_owned() + &s
+lazy_static! {
+    static ref MF: MeanStrFields = MeanStrFields::load_default();
+}
+
+#[command(async)]
+fn get_rhymes(word: String, top_n: u32) -> Result<Vec<&'static str>, String>{
+    let r = find_from_args(&WC, &MF, Args{to_find: word, mean: None, rps: None, top_n: top_n})
+        .and_then(|wdresults| Ok(wdresults.into_iter().map(|wdr| &*wdr.word.src).collect()));
+        dbg!(&r);
+        r
 }
 
 #[command(async)]
@@ -32,7 +40,7 @@ fn load_data(){
 
 fn main() {
 	tauri::Builder::default()
-		.invoke_handler(tauri::generate_handler![my_custom_command, find_stresses, load_data])
+		.invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }

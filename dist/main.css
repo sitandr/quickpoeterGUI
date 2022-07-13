@@ -53,15 +53,34 @@ footer>.status{
     padding: 3px;
 }
 
-footer input.finder {
+footer .finder{
+    display: inline-block;
+    width: 30vh;
+    visibility: hidden;
+}
+
+footer .finder .finder_input {
     background: hsl(100, 0%, 20%);
     height: 50%;
     color: hsl( 0, 0%, 80%);
     font-family: monospace;
     font-size: 1em;
-    margin-left: 20px;
-    width: 20%;
+    width: 100%;
 }
+
+footer .finder .dropup{
+    position: absolute;
+    bottom: 7vh;
+    background: hsl(40, 20%, 25%);
+}
+
+footer .finder .dropup div{
+    display: inline-block;
+    border: 1px solid black;
+    margin: 1px;
+    background: hsl(50, 25%, 30%);
+}
+
 footer>.buttons{
     float: right;
     padding: 0px;
