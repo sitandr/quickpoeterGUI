@@ -92,7 +92,6 @@ class colorEditor{
                 default:
                     console.log("Unknown event:", e);
             }
-            console.log(self.cursorSymbol);
             self.editorUPD();
             });
     }

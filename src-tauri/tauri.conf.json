@@ -39,7 +39,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": ["res", "config"],
       "shortDescription": "",
       "targets": "all",
       "windows": {

@@ -23,7 +23,6 @@ lazy_static! {
 fn get_rhymes(word: String, top_n: u32, mean: Option<String>) -> Result<Vec<&'static str>, String>{
     let r = find_from_args(&WC, &MF, Args{to_find: word, mean: mean, rps: None, top_n: top_n})
         .and_then(|wdresults| Ok(wdresults.into_iter().map(|wdr| &*wdr.word.src).collect()));
-        dbg!(&r);
         r
 }
 

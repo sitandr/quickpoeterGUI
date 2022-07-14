@@ -16,7 +16,7 @@ let status_bar = document.getElementsByClassName("status")[0];
 let editor = document.getElementsByClassName("editor")[0];
 let ed = new colorEditor(editor);
 
-let finder_panel = document.getElementsByClassName("finder")[0];
+let finder_panel = document.getElementsByClassName("finder_panel")[0];
 let field_button = document.getElementsByClassName("field_button")[0];
 let field_dropup = document.getElementById("field_dropup");
 
@@ -29,7 +29,7 @@ invoke("load_data").then(() => {
     finder_panel.style.visibility = "visible";
 });
 
-let selected_field = "Без поля";
+let selected_field = null;
 let available_fields;
 invoke("get_available_fields").then((res) => {
     res.push("Без поля");
@@ -44,9 +44,9 @@ invoke("get_available_fields").then((res) => {
             }
             else{
                 selected_field = field_name;
-                field_button.textContent = field_name;
             }
-            
+
+            field_button.textContent = field_name;
             field_dropup.style.visibility = "hidden";
         };
     }
@@ -73,38 +73,42 @@ field_button.onclick = (e) =>{
 let finder_input = document.getElementsByClassName("finder_input")[0];
 let finder_dropup = document.getElementById("finder_dropup");
 
-
-let get_rhymes = makeSingle(function*(word, n=100){return invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field})}); //makeSingle(function*(word){invoke("get_rhymes", {"word": word})});
+let get_rhymes_id_obj;
+let get_rhymes = async function(word, n=100){
+    let local_obj = get_rhymes_id_obj = new Object();
+    console.log("Finding");
+    let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field})
+    if (local_obj == get_rhymes_id_obj){
+        console.log("returned");
+        return result;
+    }
+    console.log("cancelled");
+};
 
 
 finder_input.onkeydown = (e) => {
     if (e.key == "Enter"){
         get_rhymes(finder_input.value).then((res) => {
+            if (res == undefined){
+                return;
+            }
             finder_dropup.textContent = '';
             for (const word of res){
                 let d = document.createElement("div");
                 d.appendChild(new Text(word.replace("'", "́").replace("`", "")));
                 finder_dropup.appendChild(d);
             }
+            finder_dropup.style.visibility = "visible";
+
         }, (err) => {
             let d = document.createElement("span");
             d.appendChild(new Text(err));
             d.style.color = "red";
             finder_dropup.appendChild(d);
+            finder_dropup.style.visibility = "visible";
         }) // .replace("'", "́")
     }
 };
-
-
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
 
 
 let asson_but = document.getElementById("asson_but");
