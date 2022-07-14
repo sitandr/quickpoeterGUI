@@ -19,15 +19,36 @@ class colorEditor{
         let self = this;
 
         this.editor.onkeydown = function(e){
-            if (e.keyCode == 90 && e.ctrlKey){
+            if (e.keyCode == 90 && e.ctrlKey){ // keyCode works both in English and Russian keyboard layouts
+                // Ctrl + Z
                 if (self.history.length){
                     self.text = self.history.pop();
                     self.editorUPD();
                 }
             }
+            else if (e.keyCode == 222 && e.ctrlKey){
+                // Ctrl + ` — adding stress
+                let sel = window.getSelection();
+                if (sel){
+                    let r = sel.getRangeAt(0);
+                    self.getCoord(r.startContainer, true);
+                    if (r.startOffset == 0||r.startContainer.text == ""){
+                        console.log("First symb");
+                        return; // first symbol, can't add it there
+                    }
+                    if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined && self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses) {
+                        self.insertPlainText("́");
+                        self.editorUPD();
+                    }
+                    else{
+                        console.log(self.text[self.cursorLine][self.cursorSymbol - 1])
+                    }
+                }
+            }
         }
 
         this.editor.addEventListener('beforeinput', function(e){
+            console.log("input");
 
             if (self.structure_mode){
                 e.preventDefault();
@@ -38,7 +59,7 @@ class colorEditor{
             if (sel){
                 let r = sel.getRangeAt(0);
                 self.getCoord(r.startContainer, true);
-                if (r.startOffset == 0){
+                if (r.startOffset == 0||r.startContainer.text == ""){
                     self.cursorSymbol = 0;
                 } 
                 //self.cursorSymbol += r.startOffset - 1;
@@ -120,7 +141,6 @@ class colorEditor{
             if (i !== splitted.length - 1){
                 this.insertBreak();
             }
-            
         }
 
     }

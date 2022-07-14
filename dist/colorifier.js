@@ -3,7 +3,7 @@
 
 // With the Tauri global script, enabled when `tauri.conf.json > build > withGlobalTauri` is set to true:
 const invoke = window.__TAURI__.invoke;
-const WORD = /(?=([а-яё]*))\1/gi;
+const WORD = /(?=([а-яё́]*))\1/gi;
 //const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
 const VOWEL = /[аоэуыиюеёюя]/gi;
 
@@ -11,7 +11,7 @@ const VOWEL = /[аоэуыиюеёюя]/gi;
 //1 РЛНМ П     Ш
 //2        К Х  Ф
 
-assonanses = {
+alliteration = {
 	"Р": "hsl(160, 80%, 40%)",
 	"Л": "hsl(150, 80%, 40%)",
 	"Н": "hsl(140, 80%, 40%)",
@@ -45,7 +45,7 @@ assonanses = {
         и
 */
 
-alliteration = {
+assonanses = {
 	"О": "hsl(0, 80%, 70%)",
 	"Ё": "hsl(0, 80%, 70%)",
 	"А": "hsl(30, 80%, 70%)",
@@ -107,8 +107,8 @@ class Colorifier{
 			colors.push(new Array(line.length).fill("inherit"));
 			for (let j=0; j<line.length; j++){
 				let l = line[j].toUpperCase();
-				if (l in assonanses){
-					colors[i][j] = assonanses[l];
+				if (l in alliteration){
+					colors[i][j] = alliteration[l];
 				}
 			}
 		}
@@ -122,8 +122,8 @@ class Colorifier{
 			colors.push(new Array(line.length).fill("inherit"));
 			for (let j=0; j<line.length; j++){
 				let l = line[j].toUpperCase();
-				if (l in alliteration){
-					colors[i][j] = alliteration[l];
+				if (l in assonanses){
+					colors[i][j] = assonanses[l];
 				}
 			}
 		}
@@ -146,7 +146,8 @@ class Colorifier{
 
 				let vowels = Array.from(word.matchAll(VOWEL));
 				let stresses;
-				if (vowels.length > 1){
+				let user_stressed = word.includes("́")
+				if (vowels.length > 1 && !user_stressed){
 					stresses = yield get_stresses(word);
 				}
 
@@ -156,17 +157,24 @@ class Colorifier{
 					let v = v_match[0];
 
 					let col = NO_STRESS;
-					if (vowels.length == 1){
+					if (user_stressed){
+						if (word[v_match.index + 1] == "́"){
+							col = PRIMARY_STRESS;
+						}
+					}
+					else if (vowels.length == 1){
 						col = SECONDARY_STRESS;
 					}
-					else if (stresses == null){
-						col = UNKNOWN_STRESS;
-					}
-					else if (j == stresses[0]){
-						col = PRIMARY_STRESS;
-					}
-					else if (stresses[1].includes(j)){
-						col = SECONDARY_STRESS;
+					else{
+						if (stresses == null){
+							col = UNKNOWN_STRESS;
+						}
+						else if (j == stresses[0]){
+							col = PRIMARY_STRESS;
+						}
+						else if (stresses[1].includes(j)){
+							col = SECONDARY_STRESS;
+						}
 					}
 
 					let c_lett_num = match.index + v_match.index;
