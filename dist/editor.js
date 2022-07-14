@@ -13,6 +13,7 @@ class colorEditor{
 
         this.widgets = null;
         this.structure_mode = false;
+        this.scroll_to_on_update = false;
 
         this.editorUPD();
 
@@ -84,12 +85,14 @@ class colorEditor{
                         self.insertOrReplaceText(text);
                         self.editorUPD();
                     });
+                    self.scroll_to_on_update = true;
                     e.preventDefault();
                 break
 
                 case "insertParagraph": //TODO: FIX BREAK AT START OF THE LINE
                     self.insertBreak();
                     e.preventDefault();
+                    self.scroll_to_on_update = true;
                 break
 
                 case "formatItalic":
@@ -218,6 +221,7 @@ class colorEditor{
         else if (this.cursorSymbol > 0){
             this.text[this.cursorLine] = this.text[this.cursorLine].slice(0, this.cursorSymbol - 1) + this.text[this.cursorLine].slice(this.cursorSymbol);
             this.cursorSymbol--;
+            this.scroll_to_on_update = true;
         }
     }
 
@@ -239,6 +243,8 @@ class colorEditor{
     }
 
     editorUPD(){
+
+        let scrolled = this.editor.scrollTop;
 
         this.editor.innerHTML = '';
         let symbolnum = 0;
@@ -268,6 +274,7 @@ class colorEditor{
                 div.appendChild(charSpan);
 
                 if (lineNum == this.cursorLine && charNum + 1 == this.cursorSymbol){
+
                     this.safeSelectionAt(textInSpan, 1);
                 }
 
@@ -280,6 +287,7 @@ class colorEditor{
             
 
             if (this.cursorSymbol == 0 && lineNum == this.cursorLine){
+
                 this.safeSelectionAt(div, 0);
             }
         }
@@ -319,6 +327,15 @@ class colorEditor{
                 }
             }
         });
+        this.editor.scrollTop = scrolled;
+
+        let sel = window.getSelection();
+        let t = sel.getRangeAt(0).endContainer;
+        if (t.tagName == undefined){
+            t = t.parentNode;
+        }
+        t.scrollIntoViewIfNeeded();
+
     }
 
     getCoord(obj, autoset=true){

@@ -1,6 +1,6 @@
 div.editor {
 	overflow: auto;
-	scroll-behavior: smooth;
+/*	scroll-behavior: smooth; */
 	height: 93vh;
     padding: 5px;
 	outline: none;
