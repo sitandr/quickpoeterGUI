@@ -68,7 +68,7 @@ footer .finder .finder_input {
     width: 100%;
 }
 
-footer .finder .dropup{
+footer .dropup{
     position: absolute;
     bottom: 7vh;
     background: hsl(40, 20%, 25%);
@@ -88,6 +88,24 @@ footer>.buttons{
     display: flex;
     max-block-size: -webkit-fill-available;
     flex-direction: column-reverse;
+}
+
+footer .field{
+	display: inline-block;
+}
+
+footer .field .dropup{
+	visibility: hidden;
+    user-select: none;
+}
+
+footer .field button{
+    padding: 5px;
+    width: -webkit-fill-available;
+    color: hsl(0, 0%, 20%);
+    border-width: 0px;
+    font-size: 0.7em;
+    font-family: monospace;
 }
 
 footer .buttons .choice_but{

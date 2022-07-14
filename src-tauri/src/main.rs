@@ -20,8 +20,8 @@ lazy_static! {
 }
 
 #[command(async)]
-fn get_rhymes(word: String, top_n: u32) -> Result<Vec<&'static str>, String>{
-    let r = find_from_args(&WC, &MF, Args{to_find: word, mean: None, rps: None, top_n: top_n})
+fn get_rhymes(word: String, top_n: u32, mean: Option<String>) -> Result<Vec<&'static str>, String>{
+    let r = find_from_args(&WC, &MF, Args{to_find: word, mean: mean, rps: None, top_n: top_n})
         .and_then(|wdresults| Ok(wdresults.into_iter().map(|wdr| &*wdr.word.src).collect()));
         dbg!(&r);
         r
@@ -33,6 +33,11 @@ fn find_stresses(word: &str) -> Option<(usize, Vec<usize>)>{
 }
 
 #[command(async)]
+fn get_available_fields() -> Vec<&'static str>{
+    MF.str_fields.keys().map(|s| &**s).collect()
+}
+
+#[command(async)]
 fn load_data(){
     lazy_static::initialize(&WC);
 }
@@ -40,7 +45,7 @@ fn load_data(){
 
 fn main() {
 	tauri::Builder::default()
-		.invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes])
+		.invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }
