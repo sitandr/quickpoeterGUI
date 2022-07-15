@@ -13,7 +13,6 @@ class colorEditor{
 
         this.widgets = null;
         this.structure_mode = false;
-        this.scroll_to_on_update = false;
 
         this.editorUPD();
 
@@ -34,23 +33,17 @@ class colorEditor{
                     let r = sel.getRangeAt(0);
                     self.getCoord(r.startContainer, true);
                     if (r.startOffset == 0||r.startContainer.text == ""){
-                        console.log("First symb");
                         return; // first symbol, can't add it there
                     }
                     if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined && self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses) {
                         self.insertPlainText("́");
                         self.editorUPD();
                     }
-                    else{
-                        console.log(self.text[self.cursorLine][self.cursorSymbol - 1])
-                    }
                 }
             }
         }
 
         this.editor.addEventListener('beforeinput', function(e){
-            console.log("input");
-
             if (self.structure_mode){
                 e.preventDefault();
                 return;
@@ -76,7 +69,8 @@ class colorEditor{
 
             switch(e.inputType){
                 case "insertText":
-                    self.insertPlainText(e.data);
+                    //self.insertPlainText(e.data);
+                    self.insertOrReplaceText(e.data);
                     e.preventDefault();
                 break
 
@@ -85,14 +79,13 @@ class colorEditor{
                         self.insertOrReplaceText(text);
                         self.editorUPD();
                     });
-                    self.scroll_to_on_update = true;
                     e.preventDefault();
+                    return; // can't update before replacing!
                 break
 
                 case "insertParagraph": //TODO: FIX BREAK AT START OF THE LINE
                     self.insertBreak();
                     e.preventDefault();
-                    self.scroll_to_on_update = true;
                 break
 
                 case "formatItalic":
@@ -123,13 +116,15 @@ class colorEditor{
     insertOrReplaceText(newText){
 
         let sel = window.getSelection();
-        console.assert(sel.rangeCount > 0);
         let r = sel.getRangeAt(0);
 
-        if (sel.getRangeAt(0).collapsed){
+        console.log(r, r.startContainer == r.endContainer);
+
+        if (r.collapsed){
             this.insertPlainText(newText);
         }
         else{
+            console.log("replacing…");
             this.replaceSelection(newText);
         }
     }
@@ -178,16 +173,18 @@ class colorEditor{
         this.cursorSymbol -= 1;
         let endSelect = this.getCoord(r.endContainer, false);
 
-        // first delete unnecassary text
+        // first delete unnecessary text
 
         
         if (endSelect[0] - startSelect[0]) { // more than one line
+            console.log("numerous lines")
             this.text.splice(startSelect[0] + 1, endSelect[0] - (startSelect[0] + 1)); // remove full lines
             this.text[startSelect[0]] = (this.text[startSelect[0]].substr(0, startSelect[1] - 1) + 
                                         this.text[startSelect[0] + 1].substr(endSelect[1]));
             this.text.splice(startSelect[0] + 1, 1);
         }
         else { //the same line
+            console.log("same line");
             this.text[startSelect[0]] = (this.text[startSelect[0]].substr(0, startSelect[1] - 1) + 
                                         this.text[startSelect[0]].substr(endSelect[1]));
         }
@@ -221,7 +218,6 @@ class colorEditor{
         else if (this.cursorSymbol > 0){
             this.text[this.cursorLine] = this.text[this.cursorLine].slice(0, this.cursorSymbol - 1) + this.text[this.cursorLine].slice(this.cursorSymbol);
             this.cursorSymbol--;
-            this.scroll_to_on_update = true;
         }
     }
 

@@ -76,7 +76,6 @@ let finder_dropup = document.getElementById("finder_dropup");
 let get_rhymes_id_obj;
 let get_rhymes = async function(word, n=100){
     let local_obj = get_rhymes_id_obj = new Object();
-    console.log("Finding");
     let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field})
     if (local_obj == get_rhymes_id_obj){
         console.log("returned");
