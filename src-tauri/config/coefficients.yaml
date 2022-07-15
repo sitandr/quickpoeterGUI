@@ -11,7 +11,7 @@ stresses:
   # для каждой соотв. пары гласных assonanse_distance = Σ Δassonance_vectors² (см. convertation.yaml)
   k_not_strict_stress:  2.0 # − k · assonanse_distance, если нестрогое ударение с отсутствием ударения
   k_strict_stress:      10.0 # -//-, если оба ударения есть
-  bad_rythm:            5 # чистый штраф, если не совпадают по ритму (строгий ударный со строгим безударным)
+  bad_rythm:            50 # чистый штраф, если не совпадают по ритму (строгий ударный со строгим безударным)
   # no stress -> 1.0
 
   asympt:               1.0
