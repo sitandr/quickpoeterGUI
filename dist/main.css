@@ -123,6 +123,7 @@ footer .buttons .choice_but{
 	display: flex;
     flex-direction: column-reverse;
     visibility: hidden;
+    z-index: 1;
 }
 
 footer .current_but{

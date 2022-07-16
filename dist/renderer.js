@@ -113,6 +113,7 @@ finder_input.onkeydown = (e) => {
 let asson_but = document.getElementById("asson_but");
 let allit_but = document.getElementById("allit_but");
 let stress_but = document.getElementById("stress_but");
+let no_col_but = document.getElementById("no_col_but");
 
 asson_but.onclick = (e) => {
     ed.colorify_func = Colorifier.colorify_assonanses;
@@ -131,6 +132,12 @@ stress_but.onclick = (e) => {
     ed.editorUPD();
     cur_but.firstChild.data = "Ударения";
 };
+
+no_col_but.onclick = (e) => {
+    ed.colorify_func = null;
+    ed.editorUPD();
+    cur_but.firstChild.data = "Без подсветки";
+}
 
 document.onkeydown = (e) => {
     if (e.key == "Alt"){

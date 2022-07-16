@@ -9,7 +9,7 @@ class colorEditor{
         this.cursorLine = 0;
         this.cursorSymbol = 0;
         this.history = [];
-        this.colorify_func = Colorifier.colorify_alliteration;
+        this.colorify_func = Colorifier.colorify_stresses;
 
         this.widgets = null;
         this.structure_mode = false;
@@ -118,7 +118,6 @@ class colorEditor{
         let sel = window.getSelection();
         let r = sel.getRangeAt(0);
 
-        console.log(r, r.startContainer == r.endContainer);
 
         if (r.collapsed){
             this.insertPlainText(newText);
@@ -290,39 +289,41 @@ class colorEditor{
         // colorify_stresses
         // colorify_assonanses
         // colorify_alliteration
-        this.colorify_func(this.text).then((colors) => {
-            if (colors == undefined){
-                return;
-            }
-            for (let lineNum = 0; lineNum < this.text.length; lineNum ++){
-                let line = this.text[lineNum];
+        if (this.colorify_func !== null){
+            this.colorify_func(this.text).then((colors) => {
+                if (colors == undefined || this.colorify_func === null){
+                    return;
+                }
+                for (let lineNum = 0; lineNum < this.text.length; lineNum ++){
+                    let line = this.text[lineNum];
 
-                if (this.structure_mode){ // hiding everything
-                    let offset = 0;
-                    for (let charNum = 0; charNum < line.length; charNum ++){
-                        let charInd = charNum + offset; // charInd describes the nodes; charNum — the colors/src text
-                        if (colors[lineNum][charNum] == "inherit"){
-                            this.editor.children[lineNum].children[charInd].remove();
-                            offset--;
+                    if (this.structure_mode){ // hiding everything
+                        let offset = 0;
+                        for (let charNum = 0; charNum < line.length; charNum ++){
+                            let charInd = charNum + offset; // charInd describes the nodes; charNum — the colors/src text
+                            if (colors[lineNum][charNum] == "inherit"){
+                                this.editor.children[lineNum].children[charInd].remove();
+                                offset--;
+                            }
+                            else{
+                                this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
+                                this.editor.children[lineNum].children[charInd].firstChild.data = '  '
+                            }
                         }
-                        else{
-                            this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
-                            this.editor.children[lineNum].children[charInd].firstChild.data = '  '
+                    }
+
+                    else{
+                        for (let charNum = 0; charNum < line.length; charNum ++){
+                            this.editor.children[lineNum].children[charNum].style.background = colors[lineNum][charNum];
+
+                            if (colors[lineNum][charNum] != "inherit"){
+                                this.editor.children[lineNum].children[charNum].style.color = "#111"
+                            }
                         }
                     }
                 }
-
-                else{
-                    for (let charNum = 0; charNum < line.length; charNum ++){
-                        this.editor.children[lineNum].children[charNum].style.background = colors[lineNum][charNum];
-
-                        if (colors[lineNum][charNum] != "inherit"){
-                            this.editor.children[lineNum].children[charNum].style.color = "#111"
-                        }
-                    }
-                }
-            }
-        });
+            });
+        }
         this.editor.scrollTop = scrolled;
 
         let sel = window.getSelection();

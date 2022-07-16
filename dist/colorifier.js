@@ -116,12 +116,17 @@ class Colorifier{
 	});
 
 	static colorify_assonanses = makeSingle(function*(text){
+		let stresses = yield Colorifier.colorify_stresses(text);
 		let colors = [];
 		for (let i=0; i<text.length; i++){
 			let line = text[i];
 			colors.push(new Array(line.length).fill("inherit"));
 			for (let j=0; j<line.length; j++){
 				let l = line[j].toUpperCase();
+
+				if (l == 'О' && stresses[i][j] == NO_STRESS){
+					l = 'А';
+				}
 				if (l in assonanses){
 					colors[i][j] = assonanses[l];
 				}
