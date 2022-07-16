@@ -140,12 +140,7 @@ no_col_but.onclick = (e) => {
 }
 
 document.onkeydown = (e) => {
-    if (e.key == "Alt"){
-        ed.structure_mode = !ed.structure_mode;
-        ed.editorUPD();
-        e.preventDefault();
-    }
-    else if (e.key == "Escape"){
+    if (e.key == "Escape"){
         if (finder_dropup.style.visibility == "hidden"){
             finder_dropup.style.visibility = "inherit";
         }
