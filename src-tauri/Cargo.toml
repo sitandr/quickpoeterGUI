@@ -21,6 +21,7 @@ tauri = { version = "1.0.3", features = ["api-all"] }
 quickpoeter = { path = "../../quickpoeter/" }
 lazy_static = "1.4.0"
 ordered-float = "*"
+# clap = "*"
 
 [features]
 # by default Tauri runs in production mode

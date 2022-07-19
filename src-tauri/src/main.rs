@@ -4,6 +4,7 @@
 )]
 
 
+// use clap::Parser;
 use tauri::command;
 use quickpoeter::finder::{WordCollector};
 use quickpoeter::reader::MeanStrFields;
@@ -43,8 +44,16 @@ fn load_data(){
 
 
 fn main() {
-	tauri::Builder::default()
-		.invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields])
-		.run(tauri::generate_context!())
-		.expect("error while running tauri application");
+    tauri::Builder::default()
+ /*       .setup(|_| {
+            println!("{:?}, {}", std::env::args_os(), std::env::args_os().len());
+            if std::env::args_os().len() > 1{
+                let args = Args::try_parse().expect("Error while parsing CLI");
+                println!("{:?}", find_from_args(&WC, &MF, args));
+            }
+            Ok(())
+        })*/
+        .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
