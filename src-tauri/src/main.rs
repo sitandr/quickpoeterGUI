@@ -6,6 +6,9 @@
 
 // use clap::Parser;
 // use tauri::{CustomMenuItem, Menu, Submenu};
+use std::io::Read;
+use std::io::BufReader;
+use std::fs::{File};
 use quickpoeter::meaner::MeanField;
 use tauri::command;
 use quickpoeter::finder::{WordCollector};
@@ -13,6 +16,8 @@ use quickpoeter::reader::MeanStrFields;
 use quickpoeter::api::{find, find_from_args, Args, string2word};
 
 use lazy_static::lazy_static;
+
+const DEFAULT_TEXT_FILE: &str = "current_text.txt";
 
 lazy_static! {
     static ref WC: WordCollector = WordCollector::load_default();
@@ -66,6 +71,28 @@ fn load_data(){
     lazy_static::initialize(&WC);
 }
 
+#[command(async)]
+fn load_text_file() -> Result<Vec<String>, String>{
+    read_text_file(DEFAULT_TEXT_FILE).or_else(|err| match err.kind(){
+        std::io::ErrorKind::NotFound => Ok("".to_string()),
+        _ => Err(err)
+    }).map_err(|err| format!("Could not open text: {}", err)).map(|text| text.split('\n').map(|s| s.to_string()).collect())
+}
+
+fn read_text_file(path: &str) -> Result<String, std::io::Error>{
+    let f = File::open(path)?;
+    let mut buf_reader = BufReader::new(f);
+    let mut contents = String::new();
+    buf_reader.read_to_string(&mut contents)?;
+    Ok(contents)
+}
+
+#[command(async)]
+fn save_text_file(text: Vec<String>) -> Result<(), String>{
+    let text = text.join("\n");
+    std::fs::write(DEFAULT_TEXT_FILE, text).map_err(|err| format!("Could not write text: {}", err))
+}
+
 
 fn main() {
     // here `"quit".to_string()` defines the menu item id, and the second parameter is the menu item label.
@@ -100,7 +127,8 @@ fn main() {
                 _ => {}
             }
         })*/
-        .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields])
+        .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields,
+                                                load_text_file, save_text_file])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

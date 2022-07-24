@@ -41,12 +41,6 @@ class colorEditor{
                     }
                 }
             }
-            else if (e.code == "KeyV" && e.altKey){
-                //"KeyV"
-                self.structure_mode = !self.structure_mode;
-                self.editorUPD();
-                e.preventDefault();
-            }
             
         }
 

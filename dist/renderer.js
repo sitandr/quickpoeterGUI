@@ -10,9 +10,10 @@ String.prototype.insertAt = function(index, string)
 let readClipText = window.__TAURI__.clipboard.readText;
 let appWindow = window.__TAURI__.window.appWindow;
 
+/*
 appWindow.listen('save', (event) => {
     console.log("Saving", event)
-})
+})*/ // it was code for menu… Rest in peace.
 
 function swap_visibility(el){
     console.log(el.style.visibility)
@@ -31,11 +32,26 @@ let status_bar = document.getElementsByClassName("status")[0];
 let editor = document.getElementsByClassName("editor")[0];
 let ed = new colorEditor(editor);
 
+invoke("load_text_file").then((text) => {
+    ed.text = text;
+    ed.editorUPD();
+}, (err) => {show_error(err)})
+
 let finder_panel = document.getElementsByClassName("finder_panel")[0];
 let field_button = document.getElementsByClassName("field_button")[0];
 let field_dropup = document.getElementById("field_dropup");
 
 let words_dropup = document.getElementById("words_dropup");
+
+
+function show_error(error_text){
+    let d = document.createElement("span");
+    d.appendChild(new Text(error_text));
+    d.style.color = "red";
+    finder_dropup.textContent = '';
+    finder_dropup.appendChild(d);
+    finder_dropup.style.visibility = "visible";
+}
 
 // Invoke the command
 invoke("load_data").then(() => {
@@ -146,14 +162,7 @@ finder_input.onkeydown = (e) => {
             }
             finder_dropup.style.visibility = "visible";
 
-        }, (err) => {
-            let d = document.createElement("span");
-            d.appendChild(new Text(err));
-            d.style.color = "red";
-            finder_dropup.textContent = '';
-            finder_dropup.appendChild(d);
-            finder_dropup.style.visibility = "visible";
-        }) // .replace("'", "́")
+        }, (err) => {show_error(err)})
     }
 };
 
@@ -191,4 +200,22 @@ document.onkeydown = (e) => {
     if (e.key == "Escape"){
         swap_visibility(finder_dropup)
     }
+    else if (e.code == "KeyV" && e.altKey){
+        //"KeyV"
+        ed.structure_mode = !ed.structure_mode;
+        ed.editorUPD();
+    }
+    else if (e.code == "KeyS" && e.ctrlKey){
+        invoke("save_text_file", {'text': ed.text}).then(undefined, (err) => {show_error(err)})
+        console.log("saving…")
+    }
 };
+window.__TAURI__.window.appWindow.once('tauri://close-requested',
+    (e) => {
+        invoke("save_text_file", {'text': ed.text})
+        .then(
+            () => {window.__TAURI__.process.exit(0)},
+            (err) => {show_error(err)}
+            )
+        }
+    )
