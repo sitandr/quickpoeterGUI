@@ -142,3 +142,33 @@ footer .buttons button{
     font-size: 0.7em;
     font-family: monospace;
 }
+
+
+footer .field .dropup .dropup{
+	left: 103%;
+    margin-bottom: -50%;
+	width: fit-content;
+}
+
+footer .field .dropup .dropup input{
+    background: hsl(100, 0%, 20%);
+    /* height: 50%; */
+    color: hsl( 0, 0%, 80%);
+    font-family: monospace;
+    font-size: 0.9em;
+    width: 20vh;
+}
+
+footer .field .dropup .dropup div span{
+    float: right;
+    margin-right: 2px;
+    color: hsl(0, 60%, 60%);
+}
+
+#input_field_word {
+    background: hsl(100, 0%, 20%);
+    color: hsl( 0, 0%, 80%);
+    font-family: monospace;
+    font-size: 0.9em;
+    width: 20vh;
+}

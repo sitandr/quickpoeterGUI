@@ -8,6 +8,21 @@ String.prototype.insertAt = function(index, string)
 
 
 let readClipText = window.__TAURI__.clipboard.readText;
+let appWindow = window.__TAURI__.window.appWindow;
+
+appWindow.listen('save', (event) => {
+    console.log("Saving", event)
+})
+
+function swap_visibility(el){
+    console.log(el.style.visibility)
+    if (el.style.visibility == "hidden" || el.style.visibility == ''){
+        el.style.visibility = "inherit";
+    }
+    else{
+        el.style.visibility = "hidden";
+    }
+}
 
 let cur_but = document.getElementsByClassName("current_but")[0];
 let choice_but = document.getElementsByClassName("choice_but")[0];
@@ -20,6 +35,7 @@ let finder_panel = document.getElementsByClassName("finder_panel")[0];
 let field_button = document.getElementsByClassName("field_button")[0];
 let field_dropup = document.getElementById("field_dropup");
 
+let words_dropup = document.getElementById("words_dropup");
 
 // Invoke the command
 invoke("load_data").then(() => {
@@ -33,14 +49,24 @@ let selected_field = null;
 let available_fields;
 invoke("get_available_fields").then((res) => {
     res.push("Без поля");
+    res.push("Auto");
+    res.push("New");
+    console.log(res)
     available_fields = res;
     for (const field_name of available_fields){
         let d = document.createElement('div');
         d.appendChild(new Text(field_name))
         field_dropup.appendChild(d);
+        
         d.onclick = (e) => {
             if (field_name == "Без поля"){
                 selected_field = null;
+            }
+            else if (field_name == "New"){
+                swap_visibility(words_dropup);
+                selected_field = field_name;
+                field_button.textContent = 'New'
+                return;
             }
             else{
                 selected_field = field_name;
@@ -53,30 +79,51 @@ invoke("get_available_fields").then((res) => {
 });
 
 cur_but.onclick = function (e){
-    if (choice_but.style.visibility == "hidden"){
-        choice_but.style.visibility = "inherit";
-    }
-    else{
-        choice_but.style.visibility = "hidden";
-    }
+    swap_visibility(choice_but);
 }
 
-field_button.onclick = (e) =>{
-    if (field_dropup.style.visibility == "hidden"){
-        field_dropup.style.visibility = "inherit";
-    }
-    else{
-        field_dropup.style.visibility = "hidden";
-    }
-};
+field_button.onclick = (e) =>{swap_visibility(field_dropup)};
 
 let finder_input = document.getElementsByClassName("finder_input")[0];
 let finder_dropup = document.getElementById("finder_dropup");
+let field_word_input = document.getElementById("input_field_word");
+
+field_word_input.addEventListener('input', (e) => e.target.value = e.target.value.replaceAll(/[^а-яё]/gi, ''));
+
+selected_field_words = [];
+field_word_input.onkeydown = (e) => {
+    if (e.key == "Enter"){
+        let word = field_word_input.value;
+        selected_field_words.push(word);
+
+        let div = document.createElement("div");        
+        div.appendChild(new Text(word));
+        let close = document.createElement('span');
+        close.appendChild(new Text('×'))
+        div.appendChild(close);
+        field_word_input.value = '';
+        words_dropup.insertBefore(div, field_word_input);
+
+        close.onclick = (e) => {
+            words_dropup.removeChild(div);
+            selected_field_words.splice(selected_field_words.indexOf(word), 1)
+            //TODO: remove selected
+        }
+    }
+}
 
 let get_rhymes_id_obj;
 let get_rhymes = async function(word, n=100){
     let local_obj = get_rhymes_id_obj = new Object();
-    let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field})
+    let text;
+    if (selected_field == "New"){
+        text = selected_field_words;
+    }
+    else{
+        text = ed.text;
+    }
+
+    let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field, "text": text})
     if (local_obj == get_rhymes_id_obj){
         console.log("returned");
         return result;
@@ -141,11 +188,6 @@ no_col_but.onclick = (e) => {
 
 document.onkeydown = (e) => {
     if (e.key == "Escape"){
-        if (finder_dropup.style.visibility == "hidden"){
-            finder_dropup.style.visibility = "inherit";
-        }
-        else{
-            finder_dropup.style.visibility = "hidden";
-        }
+        swap_visibility(finder_dropup)
     }
 };
