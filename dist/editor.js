@@ -85,6 +85,7 @@ class colorEditor{
                 break
 
                 case "insertParagraph": //TODO: FIX BREAK AT START OF THE LINE
+                    self.insertOrReplaceText("");
                     self.insertBreak();
                     e.preventDefault();
                 break
@@ -329,17 +330,27 @@ class colorEditor{
 
         let sel = window.getSelection();
         let t = sel.getRangeAt(0).endContainer;
-        if (t.tagName == undefined){
-            t = t.parentNode;
+        if (this.editor.contains(t)){
+            if (t.tagName == undefined){
+                t = t.parentNode;
+            }
+            t.scrollIntoViewIfNeeded();
         }
-        t.scrollIntoViewIfNeeded();
-
+        
     }
 
     getCoord(obj, autoset=true){
         // if autoset, sets current position here. At any case returns cursor position.
         let cursorSymb;
         let cursorLine;
+
+        if (!this.editor.contains(obj)){
+            if (autoset){
+                this.cursorLine = cursorLine;
+                this.cursorSymbol = cursorSymb;
+            }
+            return [null, null]
+        }
 
         if (obj.tagName === undefined){ // usual text
             obj = obj.parentNode;

@@ -108,6 +108,8 @@ footer .field .dropup div{
     border: 1px solid hsl(0, 30%, 50%);
     background: hsl(100, 0%, 15%);
 	color: hsl(200, 50%, 90%);
+    padding-right: 4px;
+    padding-left: 4px;
 }
 
 footer .field button{
@@ -163,6 +165,11 @@ footer .field .dropup .dropup div span{
     float: right;
     margin-right: 2px;
     color: hsl(0, 60%, 60%);
+}
+
+footer .field .dropup div.special{
+	background: hsl(-30, 13%, 19%);
+    color: hsl(150, 50%, 80%);
 }
 
 #input_field_word {

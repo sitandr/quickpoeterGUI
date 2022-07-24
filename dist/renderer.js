@@ -16,7 +16,6 @@ appWindow.listen('save', (event) => {
 })*/ // it was code for menu… Rest in peace.
 
 function swap_visibility(el){
-    console.log(el.style.visibility)
     if (el.style.visibility == "hidden" || el.style.visibility == ''){
         el.style.visibility = "inherit";
     }
@@ -67,30 +66,41 @@ invoke("get_available_fields").then((res) => {
     res.push("Без поля");
     res.push("Auto");
     res.push("New");
-    console.log(res)
     available_fields = res;
     for (const field_name of available_fields){
         let d = document.createElement('div');
         d.appendChild(new Text(field_name))
         field_dropup.appendChild(d);
         
-        d.onclick = (e) => {
-            if (field_name == "Без поля"){
+        if (field_name == "Без поля"){
+            d.classList.add("special");
+            d.onclick = (e) => {
                 selected_field = null;
+                field_button.textContent = field_name;
+                field_dropup.style.visibility = "hidden";
             }
-            else if (field_name == "New"){
+        }
+        else if (field_name == "New"){
+            d.classList.add("special");
+            
+            d.onclick = (e) => {
                 swap_visibility(words_dropup);
                 selected_field = field_name;
                 field_button.textContent = 'New'
-                return;
             }
-            else{
+        }
+        else{
+            if (field_name == "Auto"){
+                d.classList.add("special");
+            }
+            d.onclick = (e) => {
                 selected_field = field_name;
+                field_button.textContent = field_name;
+                field_dropup.style.visibility = "hidden";
             }
+        }
 
-            field_button.textContent = field_name;
-            field_dropup.style.visibility = "hidden";
-        };
+            
     }
 });
 
@@ -141,10 +151,8 @@ let get_rhymes = async function(word, n=100){
 
     let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field, "text": text})
     if (local_obj == get_rhymes_id_obj){
-        console.log("returned");
         return result;
     }
-    console.log("cancelled");
 };
 
 
@@ -207,7 +215,6 @@ document.onkeydown = (e) => {
     }
     else if (e.code == "KeyS" && e.ctrlKey){
         invoke("save_text_file", {'text': ed.text}).then(undefined, (err) => {show_error(err)})
-        console.log("saving…")
     }
 };
 window.__TAURI__.window.appWindow.once('tauri://close-requested',
