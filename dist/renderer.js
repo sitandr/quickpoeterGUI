@@ -150,6 +150,7 @@ finder_input.onkeydown = (e) => {
             let d = document.createElement("span");
             d.appendChild(new Text(err));
             d.style.color = "red";
+            finder_dropup.textContent = '';
             finder_dropup.appendChild(d);
             finder_dropup.style.visibility = "visible";
         }) // .replace("'", "́")
