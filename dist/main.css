@@ -163,8 +163,13 @@ footer .field .dropup .dropup input{
 
 footer .field .dropup .dropup div span{
     float: right;
+    margin-left: 4px;
     margin-right: 2px;
     color: hsl(0, 60%, 60%);
+}
+
+footer .field .dropup .dropup div{
+	display: inline-flex; /*makes × and text stay on the same line*/
 }
 
 footer .field .dropup div.special{

@@ -17,14 +17,22 @@ use quickpoeter::api::{find, find_from_args, Args, string2word};
 
 use lazy_static::lazy_static;
 
-const DEFAULT_TEXT_FILE: &str = "current_text.txt";
 
 lazy_static! {
     static ref WC: WordCollector = WordCollector::load_default();
-}
-
-lazy_static! {
     static ref MF: MeanStrFields = MeanStrFields::load_default();
+    static ref DEFAULT_TEXT_FILE: String = {
+        let mut path = tauri::api::path::data_dir().unwrap();
+        path.push("Quickpoeter");
+        let my_dir = path.into_os_string().into_string().unwrap();
+        let _ = std::fs::create_dir_all(my_dir);
+
+        let mut path = tauri::api::path::data_dir().unwrap();
+        path.push("Quickpoeter");
+        path.push("current_text");
+        path.set_extension("txt");
+        path.into_os_string().into_string().unwrap()
+    };
 }
 
 
@@ -73,7 +81,8 @@ fn load_data(){
 
 #[command(async)]
 fn load_text_file() -> Result<Vec<String>, String>{
-    read_text_file(DEFAULT_TEXT_FILE).or_else(|err| match err.kind(){
+    dbg!(&**DEFAULT_TEXT_FILE);
+    read_text_file(&**DEFAULT_TEXT_FILE).or_else(|err| match err.kind(){
         std::io::ErrorKind::NotFound => Ok("".to_string()),
         _ => Err(err)
     }).map_err(|err| format!("Could not open text: {}", err)).map(|text| text.split('\n').map(|s| s.to_string()).collect())
@@ -90,7 +99,7 @@ fn read_text_file(path: &str) -> Result<String, std::io::Error>{
 #[command(async)]
 fn save_text_file(text: Vec<String>) -> Result<(), String>{
     let text = text.join("\n");
-    std::fs::write(DEFAULT_TEXT_FILE, text).map_err(|err| format!("Could not write text: {}", err))
+    std::fs::write(&**DEFAULT_TEXT_FILE, text).map_err(|err| format!("Could not write text: {}", err))
 }
 
 

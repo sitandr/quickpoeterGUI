@@ -8,7 +8,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "Poet Assistant",
+    "productName": "Quickpoeter",
     "version": "0.1.0"
   },
   "tauri": {
@@ -31,7 +31,7 @@
         "icons/icon.ico"
       ],
       "identifier": "com.sitandr.poettool",
-      "longDescription": "",
+      "longDescription": "Простая программа, облегчающая написание стихов",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -59,7 +59,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "Poet Assistant",
+        "title": "Quickpoeter",
         "width": 800
       }
     ]
