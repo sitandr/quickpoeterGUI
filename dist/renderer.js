@@ -209,7 +209,7 @@ document.onkeydown = (e) => {
         swap_visibility(finder_dropup)
     }
     else if (e.code == "KeyV" && e.altKey){
-        //"KeyV"
+        // Alt + V — alternative view (squares)
         ed.structure_mode = !ed.structure_mode;
         ed.editorUPD();
     }

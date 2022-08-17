@@ -41,6 +41,17 @@ class colorEditor{
                     }
                 }
             }
+            else if (e.code == "Space" && e.ctrlKey){
+                // Ctrl + Space — adding pause
+                let sel = window.getSelection();
+                if (sel){
+                    let r = sel.getRangeAt(0);
+                    self.getCoord(r.startContainer, true);
+                    self.insertPlainText("​");
+                    console.log("space added")
+                    self.editorUPD();
+                }
+            }
             
         }
 

@@ -6,6 +6,7 @@ const invoke = window.__TAURI__.invoke;
 const WORD = /(?=([а-яё́]*))\1/gi;
 //const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
 const VOWEL = /[аоэуыиюеёюя]/gi;
+const PAUSE = /​/gi;
 
 //0        Т С   Ч
 //1 РЛНМ П     Ш
@@ -54,14 +55,15 @@ assonanses = {
 	"Е": "hsl(60, 80%, 70%)",
 	"У": "hsl(140, 80%, 70%)",
 	"Ю": "hsl(140, 80%, 70%)",
-	"И": "hsl(-80, 80%, 70%)",
-	"Ы": "hsl(-50, 80%, 70%)",
+	"И": "hsl(280, 80%, 70%)",
+	"Ы": "hsl(310, 80%, 70%)",
 }
 
 PRIMARY_STRESS = "hsl(70, 80%, 70%)";
 SECONDARY_STRESS = "hsl(10, 80%, 70%)";
 NO_STRESS = "hsl(150, 70%, 50%)";
-UNKNOWN_STRESS = "hsl(-80, 80%, 70%)";
+UNKNOWN_STRESS = "hsl(280, 80%, 70%)";
+PAUSE_COLOR = "hsl(0, 0%, 60%)";
 
 let cashed_stresses = {};
 
@@ -140,6 +142,10 @@ class Colorifier{
 		for (let i=0; i<text.length; i++){
 			let line = text[i];
 			colors.push(new Array(line.length).fill("inherit"));
+			let pauses_m = line.matchAll(PAUSE);
+			for (const match of pauses_m){
+				colors[i][match.index] = PAUSE_COLOR;
+			}
 			let word_matches = line.matchAll(WORD);
 
 			for (const match of word_matches){
@@ -160,8 +166,9 @@ class Colorifier{
 
 				for (const v_match of vowels){
 					let v = v_match[0];
-
+					
 					let col = NO_STRESS;
+
 					if (user_stressed){
 						if (word[v_match.index + 1] == "́"){
 							col = PRIMARY_STRESS;
