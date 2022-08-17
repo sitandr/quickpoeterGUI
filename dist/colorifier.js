@@ -184,7 +184,7 @@ class Colorifier{
 						else if (j == stresses[0]){
 							col = PRIMARY_STRESS;
 						}
-						else if (stresses[1].includes(j)){
+						else if (j == stresses[1]){
 							col = SECONDARY_STRESS;
 						}
 					}

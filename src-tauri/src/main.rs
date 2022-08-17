@@ -65,7 +65,7 @@ fn select_words_from_text(text: Vec<String>) -> Vec<String>{
 }
 
 #[command(async)]
-fn find_stresses(word: &str) -> Option<(usize, Vec<usize>)>{
+fn find_stresses(word: &str) -> Option<(usize, Option<usize>)>{
     WC.get_word(word).and_then(|w| Some(w.get_stresses()))
 }
 
