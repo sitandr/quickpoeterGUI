@@ -10,6 +10,7 @@ use std::io::Read;
 use std::io::BufReader;
 use std::fs::{File};
 use quickpoeter::meaner::MeanField;
+use quickpoeter::reader::GeneralSettings;
 use tauri::command;
 use quickpoeter::finder::{WordCollector};
 use quickpoeter::reader::MeanStrFields;
@@ -65,8 +66,13 @@ fn select_words_from_text(text: Vec<String>) -> Vec<String>{
 }
 
 #[command(async)]
-fn find_stresses(word: &str) -> Option<(usize, Option<usize>)>{
+fn find_stress(word: &str) -> Option<(usize, Option<usize>)>{
     WC.get_word(word).and_then(|w| Some(w.get_stresses()))
+}
+
+#[command(async)]
+fn find_stresses(words: Vec<&str>) -> Vec<Option<(usize, Option<usize>)>>{
+    words.into_iter().map(|w| find_stress(&*w.to_lowercase())).collect()
 }
 
 #[command(async)]
@@ -102,6 +108,10 @@ fn save_text_file(text: Vec<String>) -> Result<(), String>{
     std::fs::write(&**DEFAULT_TEXT_FILE, text).map_err(|err| format!("Could not write text: {}", err))
 }
 
+#[command(async)]
+fn get_default_settings() -> &'static GeneralSettings{
+    &WC.gs
+}
 
 fn main() {
     // here `"quit".to_string()` defines the menu item id, and the second parameter is the menu item label.
@@ -137,7 +147,7 @@ fn main() {
             }
         })*/
         .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields,
-                                                load_text_file, save_text_file])
+                                                load_text_file, save_text_file, get_default_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

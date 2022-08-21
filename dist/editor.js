@@ -13,8 +13,9 @@ class colorEditor{
 
         this.widgets = null;
         this.structure_mode = false;
+        this.cashed_colors = null;
 
-        this.editorUPD();
+        // this.editorUPD(); // we need to load text first!
 
         let self = this;
 
@@ -47,7 +48,7 @@ class colorEditor{
                 if (sel){
                     let r = sel.getRangeAt(0);
                     self.getCoord(r.startContainer, true);
-                    self.insertPlainText("​");
+                    self.insertPlainText("§");
                     console.log("space added")
                     self.editorUPD();
                 }
@@ -303,39 +304,9 @@ class colorEditor{
         // colorify_assonanses
         // colorify_alliteration
         if (this.colorify_func !== null){
-            this.colorify_func(this.text).then((colors) => {
-                if (colors == undefined || this.colorify_func === null){
-                    return;
-                }
-                for (let lineNum = 0; lineNum < this.text.length; lineNum ++){
-                    let line = this.text[lineNum];
 
-                    if (this.structure_mode){ // hiding everything
-                        let offset = 0;
-                        for (let charNum = 0; charNum < line.length; charNum ++){
-                            let charInd = charNum + offset; // charInd describes the nodes; charNum — the colors/src text
-                            if (colors[lineNum][charNum] == "inherit"){
-                                this.editor.children[lineNum].children[charInd].remove();
-                                offset--;
-                            }
-                            else{
-                                this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
-                                this.editor.children[lineNum].children[charInd].firstChild.data = '  '
-                            }
-                        }
-                    }
-
-                    else{
-                        for (let charNum = 0; charNum < line.length; charNum ++){
-                            this.editor.children[lineNum].children[charNum].style.background = colors[lineNum][charNum];
-
-                            if (colors[lineNum][charNum] != "inherit"){
-                                this.editor.children[lineNum].children[charNum].style.color = "#111"
-                            }
-                        }
-                    }
-                }
-            });
+            this.colorify(this.cashed_colors);
+            this.colorify_func(this.text).then((c) => {this.cashed_colors = c; this.colorify(c)});
         }
         this.editor.scrollTop = scrolled;
 
@@ -348,6 +319,46 @@ class colorEditor{
             t.scrollIntoViewIfNeeded();
         }
         
+    }
+
+    colorify(colors){
+        if (colors == undefined || this.colorify_func === null){
+            return;
+        }
+
+        let linesCount = Math.min(colors.length, this.text.length);
+        for (let lineNum = 0; lineNum < linesCount; lineNum ++){
+
+            let charsCount = Math.min(colors[lineNum].length, this.text[lineNum].length);
+
+            if (this.structure_mode){ // hiding everything
+                let offset = 0;
+                for (let charNum = 0; charNum < charsCount; charNum ++){
+                    let charInd = charNum + offset; // charInd describes the nodes; charNum — the colors/src text
+                    if (colors[lineNum][charNum] == "inherit"){
+                        this.editor.children[lineNum].children[charInd].remove();
+                        offset--;
+                    }
+                    else{
+                        this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
+                        this.editor.children[lineNum].children[charInd].firstChild.data = '  '
+                    }
+                }
+            }
+
+            else{
+                for (let charNum = 0; charNum < charsCount; charNum ++){
+                    this.editor.children[lineNum].children[charNum].style.background = colors[lineNum][charNum];
+
+                    if (colors[lineNum][charNum] != "inherit" && colors[lineNum][charNum] != undefined){
+                        this.editor.children[lineNum].children[charNum].style.color = "#111"
+                    }
+                    else{
+                        this.editor.children[lineNum].children[charNum].style.color = ""
+                    }
+                }
+            }
+        }
     }
 
     getCoord(obj, autoset=true){

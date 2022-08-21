@@ -3,10 +3,10 @@
 
 // With the Tauri global script, enabled when `tauri.conf.json > build > withGlobalTauri` is set to true:
 const invoke = window.__TAURI__.invoke;
-const WORD = /(?=([а-яё́]*))\1/gi;
+const WORD = /(?=([а-яё́]+))\1/gi;
 //const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
 const VOWEL = /[аоэуыиюеёюя]/gi;
-const PAUSE = /​/gi;
+const PAUSE = /§/gi;
 
 //0        Т С   Ч
 //1 РЛНМ П     Ш
@@ -22,7 +22,7 @@ alliteration = {
 	"К": "hsl(40, 80%,  55%)",
 	"С": "hsl(30, 100%, 70%)",
 	"Ш": "hsl(0,   70%, 80%)",
-	"Ч": "hsl(-40, 80%, 80%)",
+	"Ч": "hsl(320, 80%, 80%)",
 
 	"Х": "hsl(20, 80%,  55%)",
 	"Ф": "hsl(13, 80%,  55%)",
@@ -35,15 +35,14 @@ alliteration = {
 	"З": "hsl(50, 100%, 40%)", // с*
 	"Ц": "hsl(40, 100%, 70%)", // тс
 	"Щ": "hsl(0,   90%, 80%)", // ш^
-	"Й": "hsl(-80, 60%, 60%)", // j
+	"Й": "hsl(280, 60%, 60%)", // j
 };
 
 /*
  о 
-  а э 
-           
+  а  э
+        и    
 у     ы
-        и
 */
 
 assonanses = {
@@ -53,20 +52,17 @@ assonanses = {
 	"Я": "hsl(30, 80%, 70%)",
 	"Э": "hsl(60, 80%, 70%)",
 	"Е": "hsl(60, 80%, 70%)",
-	"У": "hsl(140, 80%, 70%)",
-	"Ю": "hsl(140, 80%, 70%)",
-	"И": "hsl(280, 80%, 70%)",
-	"Ы": "hsl(310, 80%, 70%)",
+	"У": "hsl(200, 80%, 70%)",
+	"Ю": "hsl(200, 80%, 70%)",
+	"И": "hsl(120, 80%, 72%)",
+	"Ы": "hsl(157, 80%, 65%)",
 }
 
 PRIMARY_STRESS = "hsl(70, 80%, 70%)";
 SECONDARY_STRESS = "hsl(10, 80%, 70%)";
 NO_STRESS = "hsl(150, 70%, 50%)";
-UNKNOWN_STRESS = "hsl(280, 80%, 70%)";
-PAUSE_COLOR = "hsl(0, 0%, 60%)";
-
-let cashed_stresses = {};
-
+UNKNOWN_STRESS = "hsl(300, 80%, 70%)";
+PAUSE_COLOR = "hsl(280, 60%, 50%)";
 
 function makeSingle(generator) { // function copied from some site to cancel not actual calls of async
   let globalNonce;
@@ -91,15 +87,6 @@ function makeSingle(generator) { // function copied from some site to cancel not
     }
   };
 }
-
-async function get_stresses(word){
-	word = word.toLowerCase();
-	if (!(word in cashed_stresses)){
-		cashed_stresses[word] = await invoke("find_stresses", {"word": word});
-	}
-	return cashed_stresses[word];
-}
-
 
 class Colorifier{
 	static colorify_alliteration = makeSingle(function*(text){
@@ -146,9 +133,13 @@ class Colorifier{
 			for (const match of pauses_m){
 				colors[i][match.index] = PAUSE_COLOR;
 			}
-			let word_matches = line.matchAll(WORD);
+			let word_matches = Array.from(line.matchAll(WORD));
+			let all_stresses = yield invoke("find_stresses", {"words": word_matches.map((m) => m[0])});
+			console.log("Yielded", line, all_stresses, word_matches.map((m) => m[0]));
 
-			for (const match of word_matches){
+			for (let ind = 0; ind < all_stresses.length; ind++){
+				let match = word_matches[ind];
+				let stresses = all_stresses[ind];
 				let word = match[0];
 
 				if (word.length == 0){
@@ -156,11 +147,7 @@ class Colorifier{
 				}
 
 				let vowels = Array.from(word.matchAll(VOWEL));
-				let stresses;
 				let user_stressed = word.includes("́")
-				if (vowels.length > 1 && !user_stressed){
-					stresses = yield get_stresses(word);
-				}
 
 				let j = 0;
 
@@ -178,7 +165,10 @@ class Colorifier{
 						col = SECONDARY_STRESS;
 					}
 					else{
-						if (stresses == null){
+						if (word[v_match.index] == "ё"){
+							col = PRIMARY_STRESS;
+						}
+						else if (stresses == null){
 							col = UNKNOWN_STRESS;
 						}
 						else if (j == stresses[0]){
