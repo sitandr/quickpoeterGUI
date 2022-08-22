@@ -70,12 +70,17 @@ footer .finder .finder_input {
     font-family: monospace;
     font-size: 1em;
     width: 100%;
+    margin: 3px 0px 0px 0px;
 }
 
 footer .dropup{
     position: absolute;
     bottom: 7vh;
     background: hsl(40, 20%, 25%);
+}
+
+#finder_dropup{
+    left: 0;
 }
 
 footer .finder .dropup div{
@@ -118,6 +123,21 @@ footer .field button{
     color: hsl(0, 0%, 20%);
     border-width: 0px;
     font-size: 0.7em;
+    font-family: monospace;
+}
+
+footer .set_rhymes{
+    display: inline-block;
+    margin-left: 2px;
+    margin-right: -5px;
+}
+
+footer .set_rhymes button{
+    padding: 2px 5px 3px 5px;
+    color: hsl(0, 0%, 20%);
+    border-width: 0px;
+    font-size: 0.7em;
+    border-radius: 30%;
     font-family: monospace;
 }
 
@@ -175,6 +195,27 @@ footer .field .dropup .dropup div{
 footer .field .dropup div.special{
 	background: hsl(-30, 13%, 19%);
     color: hsl(150, 50%, 80%);
+}
+
+footer .info_block{
+    position: fixed;
+    top: 0;
+    visibility: hidden;
+    background: hsl(0, 30%, 50%);
+    right: 0;
+    font-size: 0.7em;
+    margin: 2px;
+}
+
+footer .info_block div{
+    background: hsl(0, 30%, 33%);
+    color: hsl( 320, 100%, 90%);
+    margin: 2px;
+}
+
+footer .info_block span{
+    color: hsl(120, 100%, 88%);
+    float: right;
 }
 
 #input_field_word {

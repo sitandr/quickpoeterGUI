@@ -156,6 +156,8 @@ let get_rhymes = async function(word, n=100){
 };
 
 
+
+
 finder_input.onkeydown = (e) => {
     if (e.key == "Enter"){
         get_rhymes(finder_input.value).then((res) => {
@@ -163,9 +165,39 @@ finder_input.onkeydown = (e) => {
                 return;
             }
             finder_dropup.textContent = '';
+            let info_block = document.getElementsByClassName("info_block")[0];
+
             for (const word of res){
                 let d = document.createElement("div");
-                d.appendChild(new Text(word.replace("'", "́").replace("`", "")));
+                d.appendChild(new Text(word.word.replace("'", "́").replace("`", "")));
+
+                d.onmouseenter = (e) => {
+                    console.log("Entered")
+                    info_block.innerHTML = '';
+                    info_block.style.visibility = "inherit";
+                    let word_prop = (s) => {return Math.round(word[s]*1_000)/1_000};
+                    let div_create = (prop) => {
+                        let d = document.createElement("div");
+                        d.appendChild(new Text(prop + ": "));
+                        let s = document.createElement("span");
+                        s.appendChild(new Text(word_prop(prop)));
+                        d.appendChild(s);
+                        return d;
+                    }
+
+                    info_block.appendChild(div_create("dist")); // distance should be the first
+
+                    for (prop in word){
+                        if (prop == "word" || prop == "dist"){
+                            continue;
+                        }
+                        
+                        info_block.appendChild(div_create(prop));
+                    }
+                }
+                d.onmouseleave = (e) => {
+                    info_block.style.visibility = "hidden";
+                }
                 finder_dropup.appendChild(d);
             }
             finder_dropup.style.visibility = "visible";

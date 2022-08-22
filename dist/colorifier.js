@@ -135,7 +135,6 @@ class Colorifier{
 			}
 			let word_matches = Array.from(line.matchAll(WORD));
 			let all_stresses = yield invoke("find_stresses", {"words": word_matches.map((m) => m[0])});
-			console.log("Yielded", line, all_stresses, word_matches.map((m) => m[0]));
 
 			for (let ind = 0; ind < all_stresses.length; ind++){
 				let match = word_matches[ind];

@@ -9,6 +9,7 @@
 use std::io::Read;
 use std::io::BufReader;
 use std::fs::{File};
+use quickpoeter::finder::WordDistanceResult;
 use quickpoeter::meaner::MeanField;
 use quickpoeter::reader::GeneralSettings;
 use tauri::command;
@@ -38,7 +39,7 @@ lazy_static! {
 
 
 #[command(async)]
-fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>) -> Result<Vec<&'static str>, String>{
+fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>) -> Result<Vec<WordDistanceResult<'static>>, String>{
     Ok(
         if mean == Some("Auto".to_string()){
             find(&WC, string2word(&WC, word)?, MeanField::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)
@@ -48,9 +49,9 @@ fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>)
                                                     .map_err(|words| format!("Unknown words: {:?}", words))?), &vec![], top_n)
         }
         else{
-            find_from_args(&WC, &MF, Args{to_find: word, field: mean, rps: None, top_n: top_n})?
+            find_from_args(&WC, &MF, Args{to_find: word, field: mean, rps: None, top_n})?
         }
-        .into_iter().map(|wdr| &*wdr.word.src).collect()
+        .into_iter().collect()
     )
 }
 

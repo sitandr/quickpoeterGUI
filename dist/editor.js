@@ -304,8 +304,9 @@ class colorEditor{
         // colorify_assonanses
         // colorify_alliteration
         if (this.colorify_func !== null){
-
-            this.colorify(this.cashed_colors);
+            if (!this.structure_mode){
+                this.colorify(this.cashed_colors);
+            }
             this.colorify_func(this.text).then((c) => {this.cashed_colors = c; this.colorify(c)});
         }
         this.editor.scrollTop = scrolled;
@@ -329,7 +330,7 @@ class colorEditor{
         let linesCount = Math.min(colors.length, this.text.length);
         for (let lineNum = 0; lineNum < linesCount; lineNum ++){
 
-            let charsCount = Math.min(colors[lineNum].length, this.text[lineNum].length);
+            let charsCount = Math.min(colors[lineNum].length, this.text[lineNum].length, this.editor.children[lineNum].children.length);
 
             if (this.structure_mode){ // hiding everything
                 let offset = 0;
