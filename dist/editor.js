@@ -48,9 +48,43 @@ class colorEditor{
                 if (sel){
                     let r = sel.getRangeAt(0);
                     self.getCoord(r.startContainer, true);
-                    self.insertPlainText("§");
+                    self.insertPlainText("¦");
                     console.log("space added")
                     self.editorUPD();
+                }
+            }
+            else if (e.code == "Comma" && e.ctrlKey){
+                // Ctrl + , (like <) — reducing sound, adding ‹
+                let sel = window.getSelection();
+                if (sel){
+                    let r = sel.getRangeAt(0);
+                    self.getCoord(r.startContainer, true);
+                    if (r.startOffset == 0||r.startContainer.text == ""){
+                        return; // first symbol, can't add it there
+                    }
+                    if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined
+                        && (self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses
+                        || self.text[self.cursorLine][self.cursorSymbol - 1] == "́")) {
+                        self.insertPlainText("‹");
+                        self.editorUPD();
+                    }
+                }
+            }
+            else if (e.code == "Period" && e.ctrlKey){
+                // Ctrl + , (like <) — reducing sound, adding ›
+                let sel = window.getSelection();
+                if (sel){
+                    let r = sel.getRangeAt(0);
+                    self.getCoord(r.startContainer, true);
+                    if (r.startOffset == 0||r.startContainer.text == ""){
+                        return; // first symbol, can't add it there
+                    }
+                    if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined
+                        && (self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses
+                        || self.text[self.cursorLine][self.cursorSymbol - 1] == "́")) {
+                        self.insertPlainText("›");
+                        self.editorUPD();
+                    }
                 }
             }
             
@@ -342,7 +376,18 @@ class colorEditor{
                     }
                     else{
                         this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
-                        this.editor.children[lineNum].children[charInd].firstChild.data = '  '
+                        let s = '  ';
+
+                        console.log(this.text[lineNum][charNum], this.text[lineNum][charNum + 1]);
+
+                        if (this.text[lineNum][charNum + 1] == '›'){
+                            s += ' ';
+                        }
+                        else if (this.text[lineNum][charNum + 1] == '‹'){
+                            s = s.slice(0, s.length - 1)
+                        }
+                        this.editor.children[lineNum].children[charInd].firstChild.data = s;
+                        
                     }
                 }
             }

@@ -3,10 +3,10 @@
 
 // With the Tauri global script, enabled when `tauri.conf.json > build > withGlobalTauri` is set to true:
 const invoke = window.__TAURI__.invoke;
-const WORD = /(?=([а-яё́]+))\1/gi;
+const WORD = /(?=([а-яё́›‹¦]+))\1/gi;
 //const SYLL = /(?=([аоэуыиюеёюя]?))\1(?=([бвгджзйклмнпрстфхцчшщ]*))\2/gi;
 const VOWEL = /[аоэуыиюеёюя]/gi;
-const PAUSE = /§/gi;
+const PAUSE = /¦/gi;
 
 //0        Т С   Ч
 //1 РЛНМ П     Ш
@@ -134,7 +134,9 @@ class Colorifier{
 				colors[i][match.index] = PAUSE_COLOR;
 			}
 			let word_matches = Array.from(line.matchAll(WORD));
-			let all_stresses = yield invoke("find_stresses", {"words": word_matches.map((m) => m[0])});
+			let all_stresses = yield invoke("find_stresses", {"words":
+											 word_matches.map((m) => 
+											 m[0].replace(/[›‹¦]/g, ""))});
 
 			for (let ind = 0; ind < all_stresses.length; ind++){
 				let match = word_matches[ind];
