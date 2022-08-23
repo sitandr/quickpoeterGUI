@@ -4,13 +4,16 @@
 )]
 
 
+use std::fs;
 // use clap::Parser;
 // use tauri::{CustomMenuItem, Menu, Submenu};
 use std::io::Read;
 use std::io::BufReader;
-use std::fs::{File};
+use std::fs::File;
+use std::sync::RwLock;
 use quickpoeter::finder::WordDistanceResult;
 use quickpoeter::meaner::MeanField;
+use quickpoeter::reader;
 use quickpoeter::reader::GeneralSettings;
 use tauri::command;
 use quickpoeter::finder::{WordCollector};
@@ -23,12 +26,15 @@ use lazy_static::lazy_static;
 lazy_static! {
     static ref WC: WordCollector = WordCollector::load_default();
     static ref MF: MeanStrFields = MeanStrFields::load_default();
-    static ref DEFAULT_TEXT_FILE: String = {
+    static ref GS: RwLock<GeneralSettings> = RwLock::new(GeneralSettings::load_default());
+    static ref APP_DATA_PATH: String= {
         let mut path = tauri::api::path::data_dir().unwrap();
         path.push("Quickpoeter");
         let my_dir = path.into_os_string().into_string().unwrap();
-        let _ = std::fs::create_dir_all(my_dir);
-
+        let _ = std::fs::create_dir_all(&my_dir);
+        my_dir
+    };
+    static ref DEFAULT_TEXT_FILE: String = {
         let mut path = tauri::api::path::data_dir().unwrap();
         path.push("Quickpoeter");
         path.push("current_text");
@@ -42,14 +48,14 @@ lazy_static! {
 fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>) -> Result<Vec<WordDistanceResult<'static>>, String>{
     Ok(
         if mean == Some("Auto".to_string()){
-            find(&WC, string2word(&WC, word)?, MeanField::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)
+            find(&WC, &GS.read().unwrap(), string2word(&WC, word)?, MeanField::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)
         }
         else if mean == Some("New".to_string()){
-            find(&WC, string2word(&WC, word)?, Some(&MeanField::from_str(&WC, &text.iter().map(|s| &**s).collect())
+            find(&WC, &GS.read().unwrap(), string2word(&WC, word)?, Some(&MeanField::from_str(&WC, &text.iter().map(|s| &**s).collect())
                                                     .map_err(|words| format!("Unknown words: {:?}", words))?), &vec![], top_n)
         }
         else{
-            find_from_args(&WC, &MF, Args{to_find: word, field: mean, rps: None, top_n})?
+            find_from_args(&WC, &MF, &GS.read().unwrap(), Args{to_find: word, field: mean, rps: None, top_n})?
         }
         .into_iter().collect()
     )
@@ -87,6 +93,39 @@ fn load_data(){
 }
 
 #[command(async)]
+fn load_settings(name: &str){
+    let mut gs = GS.write().unwrap();
+    *gs = match name{
+        "default" => reader::yaml_read("config/coefficients.yaml"),
+        _ => {
+            let mut path = APP_DATA_PATH.clone();
+            path.push_str(name);
+            reader::yaml_read(&*path)
+        }
+    };
+}
+
+#[command]
+fn get_available_settings() -> Vec<String>{
+    let mut res = vec![];
+    for entry in fs::read_dir(APP_DATA_PATH.clone()).expect("Can't access data dir"){
+        let name = entry.expect("Error at file parsing").file_name().into_string().expect("Not valid UTF in filename");
+        if name.starts_with("config") && name.ends_with(".yaml"){
+            res.push(name.strip_prefix("config").unwrap().strip_suffix(".yaml").unwrap().to_string())
+        }
+    }
+    res
+}
+
+#[command(async)]
+fn save_settings(name: &str, gs: GeneralSettings){
+    let mut path = APP_DATA_PATH.clone();
+    path.push_str(name);
+    let buffer = File::create(path).expect("Error while opening settings for writing");
+    serde_yaml::to_writer(buffer, &gs).expect("Error while writing");
+}
+
+#[command(async)]
 fn load_text_file() -> Result<Vec<String>, String>{
     dbg!(&**DEFAULT_TEXT_FILE);
     read_text_file(&**DEFAULT_TEXT_FILE).or_else(|err| match err.kind(){
@@ -110,8 +149,8 @@ fn save_text_file(text: Vec<String>) -> Result<(), String>{
 }
 
 #[command(async)]
-fn get_default_settings() -> &'static GeneralSettings{
-    &WC.gs
+fn get_settings() -> GeneralSettings{
+    (*GS.read().unwrap()).clone()
 }
 
 fn main() {
@@ -148,7 +187,8 @@ fn main() {
             }
         })*/
         .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields,
-                                                load_text_file, save_text_file, get_default_settings])
+                                                load_text_file, save_text_file,
+                                                get_settings, load_settings, get_available_settings, save_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

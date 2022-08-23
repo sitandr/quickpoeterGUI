@@ -52,6 +52,28 @@ function show_error(error_text){
     finder_dropup.style.visibility = "visible";
 }
 
+async function mutate_settings(){
+    let sett = await invoke("get_settings");
+    for (prop in sett){
+        for (subprop in sett[prop]){
+            sett[prop][subprop] = (0.9 + Math.random()/5) * sett[prop][subprop];
+        }
+    }
+    await invoke("save_settings", {"name": "temp", "gs": sett});
+    await invoke("load_settings", {"name": "temp"});
+}
+
+document.getElementsByClassName("reload_settings_btn")[0].onclick = () => {
+    invoke("load_settings", {"name": "default"})
+};
+document.getElementsByClassName("random_settings_btn")[0].onclick = () => {
+    mutate_settings();
+};
+
+document.getElementsByClassName("set_rhymes_button")[0].onclick = () => {
+    swap_visibility(document.getElementById("rhymes_settings"))
+};
+
 // Invoke the command
 invoke("load_data").then(() => {
     //status_bar.firstChild.data ="Loaded data"
