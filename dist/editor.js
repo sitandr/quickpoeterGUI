@@ -62,9 +62,11 @@ class colorEditor{
                     if (r.startOffset == 0||r.startContainer.text == ""){
                         return; // first symbol, can't add it there
                     }
-                    if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined
-                        && (self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses
-                        || self.text[self.cursorLine][self.cursorSymbol - 1] == "́")) {
+                    let prev = self.text[self.cursorLine][self.cursorSymbol - 1];
+                    if (prev != undefined
+                        && (prev.toUpperCase() in assonanses
+                        || prev == "́"
+                        || prev == "‹")) {
                         self.insertPlainText("‹");
                         self.editorUPD();
                     }
@@ -79,9 +81,11 @@ class colorEditor{
                     if (r.startOffset == 0||r.startContainer.text == ""){
                         return; // first symbol, can't add it there
                     }
-                    if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined
-                        && (self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses
-                        || self.text[self.cursorLine][self.cursorSymbol - 1] == "́")) {
+                    let prev = self.text[self.cursorLine][self.cursorSymbol - 1];
+                    if (prev != undefined
+                        && (prev.toUpperCase() in assonanses
+                        || prev == "́"
+                        || prev == "›")) {
                         self.insertPlainText("›");
                         self.editorUPD();
                     }
@@ -378,13 +382,16 @@ class colorEditor{
                         this.editor.children[lineNum].children[charInd].style.background = colors[lineNum][charNum];
                         let s = '  ';
 
-                        console.log(this.text[lineNum][charNum], this.text[lineNum][charNum + 1]);
-
-                        if (this.text[lineNum][charNum + 1] == '›'){
-                            s += ' ';
-                        }
-                        else if (this.text[lineNum][charNum + 1] == '‹'){
-                            s = s.slice(0, s.length - 1)
+                        for (let delta = 1;;delta++){
+                            if (this.text[lineNum][charNum + delta] == '›'){
+                                s += ' ';
+                            }
+                            else if (this.text[lineNum][charNum + delta] == '‹'){
+                                s = s.slice(0, s.length - 1)
+                            }
+                            else{
+                                break;
+                            }
                         }
                         this.editor.children[lineNum].children[charInd].firstChild.data = s;
                         
