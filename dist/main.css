@@ -132,6 +132,14 @@ footer .set_rhymes{
     margin-right: -5px;
 }
 
+footer .set_rhymes div.selected{
+    color:hsl(0, 60%, 60%);
+}
+
+footer .set_rhymes div{
+    border: 1px solid hsl(0, 30%, 50%);
+}
+
 footer .set_rhymes button{
     padding: 2px 5px 3px 5px;
     color: hsl(0, 0%, 20%);
@@ -139,7 +147,14 @@ footer .set_rhymes button{
     font-size: 0.7em;
     border-radius: 30%;
     font-family: monospace;
+    float: right;
+    margin-left: 3px;
 }
+
+footer .set_rhymes .set_rhymes_button{
+    float: none;
+}
+
 
 footer .set_rhymes .random_settings_btn{
     font-size: 1.3em;
@@ -152,6 +167,7 @@ footer .set_rhymes .random_settings_btn{
 
 #rhymes_settings{
     visibility: hidden;
+    background: hsl(50, 20%, 11%);
 }
 
 footer .buttons .choice_but{

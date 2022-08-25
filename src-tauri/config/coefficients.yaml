@@ -29,8 +29,8 @@ stresses:
   shift_syll_ending:     1.0
   pow_syll_ending:       1.0
 
-  asympt:               1.0
-  asympt_shift:         2.0
+  asympt:               1.0 # финальное расстояние делится на (число_слогов + asympt_shift)^asympt
+  asympt_shift:         2.0 # далее аналогично
   weight:               13.0
 
 consonant_structure:
@@ -67,9 +67,9 @@ alliteration:
 
 meaning:
   pow: 0.33
-  single_pow: 2.0
-  single_weight: 1.0 # дополнительный множитель, умножается на финальный вес
-  weight: 4.0
+  single_pow: 0.33
+  single_weight: 0.005 # дополнительный множитель, умножается на финальный вес
+  weight: 10.0
 
 popularity: # плохо давать никому неизвестные слова
   pow: 1.2

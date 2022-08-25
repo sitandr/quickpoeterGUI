@@ -59,28 +59,78 @@ async function mutate_settings(){
             sett[prop][subprop] = (0.9 + Math.random()/5) * sett[prop][subprop];
         }
     }
-    await invoke("save_settings", {"name": "temp", "gs": sett});
-    await invoke("load_settings", {"name": "temp"});
+    await invoke("save_settings", {"name": "Мутировавшие настройки", "gs": sett});
 }
-
-document.getElementsByClassName("reload_settings_btn")[0].onclick = () => {
-    invoke("load_settings", {"name": "default"})
-};
-document.getElementsByClassName("random_settings_btn")[0].onclick = () => {
-    mutate_settings();
-};
 
 document.getElementsByClassName("set_rhymes_button")[0].onclick = () => {
     swap_visibility(document.getElementById("rhymes_settings"))
 };
 
+let current_settings_name = "default";
+
+async function load_settings(name){
+    await invoke("load_settings", {"name": name}).then(null, (err) => show_error(err));
+}
+
+function render_settings(){
+    invoke("get_available_settings").then((res) => {
+        let rhymes_settings = document.getElementById("rhymes_settings");
+        rhymes_settings.innerHTML = '';
+        
+        res.push("default");
+        for (let i in res){
+            let name = res[i];
+            let d = document.createElement("div");
+            d.appendChild(new Text(name=="default"?"Стандартные настройки":name));
+            
+            let b;
+    
+            if (current_settings_name == name){
+                b = document.createElement("button");
+                b.title = "Перезагрузить"
+                b.appendChild(new Text("↺"));
+                b.classList.add("reload_settings_btn");
+                b.onclick = () => {
+                    load_settings(name);
+                    render_settings();
+                };
+                d.classList.add("selected");
+            }
+            else{
+                b = document.createElement("button");
+                b.title = "Выбрать";
+                b.appendChild(new Text("✓"));
+                b.onclick = () => {
+                    current_settings_name = name;
+                    load_settings(name);
+                    render_settings();
+                }
+            }
+    
+            d.appendChild(b);
+            rhymes_settings.appendChild(d);
+        }
+        let d = document.createElement("div");
+        let b = document.createElement("button");
+        b.appendChild(new Text("⚅"));
+        b.classList.add("random_settings_btn");
+        b.titile = "Создать случайные настройки";
+        b.onclick = () => {
+            mutate_settings().then(() => {render_settings()});
+        }
+        d.appendChild(b)
+        rhymes_settings.appendChild(d);
+    })
+}
+
+
 // Invoke the command
 invoke("load_data").then(() => {
-    //status_bar.firstChild.data ="Loaded data"
-    //status_bar.style.visibility = "hidden";
     status_bar.remove();
     finder_panel.style.visibility = "visible";
 });
+
+render_settings();
 
 let selected_field = null;
 let available_fields;

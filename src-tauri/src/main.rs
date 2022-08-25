@@ -93,16 +93,25 @@ fn load_data(){
 }
 
 #[command(async)]
-fn load_settings(name: &str){
+fn load_settings(name: &str) -> Result<(), String>{
     let mut gs = GS.write().unwrap();
     *gs = match name{
-        "default" => reader::yaml_read("config/coefficients.yaml"),
+        "default" => reader::yaml_read("config/coefficients.yaml")?,
         _ => {
             let mut path = APP_DATA_PATH.clone();
+            path.push('/');
+            path.push_str("config_");
             path.push_str(name);
-            reader::yaml_read(&*path)
+            path.push_str(".yaml");
+            reader::yaml_read(&*path)?
         }
     };
+    Ok(())
+}
+
+#[command]
+fn get_app_data_path() -> &'static str{
+    &*APP_DATA_PATH
 }
 
 #[command]
@@ -110,8 +119,8 @@ fn get_available_settings() -> Vec<String>{
     let mut res = vec![];
     for entry in fs::read_dir(APP_DATA_PATH.clone()).expect("Can't access data dir"){
         let name = entry.expect("Error at file parsing").file_name().into_string().expect("Not valid UTF in filename");
-        if name.starts_with("config") && name.ends_with(".yaml"){
-            res.push(name.strip_prefix("config").unwrap().strip_suffix(".yaml").unwrap().to_string())
+        if name.starts_with("config_") && name.ends_with(".yaml"){
+            res.push(name.strip_prefix("config_").unwrap().strip_suffix(".yaml").unwrap().to_string())
         }
     }
     res
@@ -120,7 +129,9 @@ fn get_available_settings() -> Vec<String>{
 #[command(async)]
 fn save_settings(name: &str, gs: GeneralSettings){
     let mut path = APP_DATA_PATH.clone();
+    path.push_str("/config_");
     path.push_str(name);
+    path.push_str(".yaml");
     let buffer = File::create(path).expect("Error while opening settings for writing");
     serde_yaml::to_writer(buffer, &gs).expect("Error while writing");
 }
@@ -187,7 +198,7 @@ fn main() {
             }
         })*/
         .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields,
-                                                load_text_file, save_text_file,
+                                                load_text_file, save_text_file, get_app_data_path,
                                                 get_settings, load_settings, get_available_settings, save_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

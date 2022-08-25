@@ -394,7 +394,6 @@ class colorEditor{
                             }
                         }
                         this.editor.children[lineNum].children[charInd].firstChild.data = s;
-                        
                     }
                 }
             }
