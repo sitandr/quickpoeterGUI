@@ -12,12 +12,12 @@ use std::io::BufReader;
 use std::fs::File;
 use std::sync::RwLock;
 use quickpoeter::finder::WordDistanceResult;
-use quickpoeter::meaner::MeanField;
+use quickpoeter::meaner::MeanTheme;
 use quickpoeter::reader;
 use quickpoeter::reader::GeneralSettings;
 use tauri::command;
 use quickpoeter::finder::{WordCollector};
-use quickpoeter::reader::MeanStrFields;
+use quickpoeter::reader::MeanStrThemes;
 use quickpoeter::api::{find, find_from_args, Args, string2word};
 
 use lazy_static::lazy_static;
@@ -25,7 +25,7 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     static ref WC: WordCollector = WordCollector::load_default();
-    static ref MF: MeanStrFields = MeanStrFields::load_default();
+    static ref MF: MeanStrThemes = MeanStrThemes::load_default();
     static ref GS: RwLock<GeneralSettings> = RwLock::new(GeneralSettings::load_default());
     static ref APP_DATA_PATH: String= {
         let mut path = tauri::api::path::data_dir().unwrap();
@@ -48,14 +48,14 @@ lazy_static! {
 fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>) -> Result<Vec<WordDistanceResult<'static>>, String>{
     Ok(
         if mean == Some("Auto".to_string()){
-            find(&WC, &GS.read().unwrap(), string2word(&WC, word)?, MeanField::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)
+            find(&WC, &GS.read().unwrap(), string2word(&WC, word)?, MeanTheme::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)
         }
         else if mean == Some("New".to_string()){
-            find(&WC, &GS.read().unwrap(), string2word(&WC, word)?, Some(&MeanField::from_str(&WC, &text.iter().map(|s| &**s).collect())
+            find(&WC, &GS.read().unwrap(), string2word(&WC, word)?, Some(&MeanTheme::from_str(&WC, &text.iter().map(|s| &**s).collect())
                                                     .map_err(|words| format!("Unknown words: {:?}", words))?), &vec![], top_n)
         }
         else{
-            find_from_args(&WC, &MF, &GS.read().unwrap(), &Args{to_find: word, field: mean, rps: None, top_n, debug: false})?
+            find_from_args(&WC, &MF, &GS.read().unwrap(), &Args{to_find: word, theme: mean, rps: None, top_n, debug: false})?
         }
         .into_iter().collect()
     )
@@ -83,8 +83,8 @@ fn find_stresses(words: Vec<&str>) -> Vec<Option<(usize, Option<usize>)>>{
 }
 
 #[command(async)]
-fn get_available_fields() -> Vec<&'static str>{
-    MF.str_fields.keys().map(|s| &**s).collect()
+fn get_available_themes() -> Vec<&'static str>{
+    MF.str_themes.keys().map(|s| &**s).collect()
 }
 
 #[command(async)]
@@ -197,7 +197,7 @@ fn main() {
                 _ => {}
             }
         })*/
-        .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_fields,
+        .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_themes,
                                                 load_text_file, save_text_file, get_app_data_path,
                                                 get_settings, load_settings, get_available_settings, save_settings])
         .run(tauri::generate_context!())

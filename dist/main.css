@@ -99,16 +99,16 @@ footer>.buttons{
     flex-direction: column-reverse;
 }
 
-footer .field{
+footer .theme{
 	display: inline-block;
 }
 
-footer .field .dropup{
+footer .theme .dropup{
 	visibility: hidden;
     user-select: none;
 }
 
-footer .field .dropup div{
+footer .theme .dropup div{
 	/*border: 1px solid hsl(0, 20%, 70%);*/
     border: 1px solid hsl(0, 30%, 50%);
     background: hsl(100, 0%, 15%);
@@ -117,7 +117,7 @@ footer .field .dropup div{
     padding-left: 4px;
 }
 
-footer .field button{
+footer .theme button{
     padding: 5px;
     width: -webkit-fill-available;
     color: hsl(0, 0%, 20%);
@@ -195,13 +195,13 @@ footer .buttons button{
 }
 
 
-footer .field .dropup .dropup{
+footer .theme .dropup .dropup{
 	left: 103%;
     margin-bottom: -50%;
 	width: fit-content;
 }
 
-footer .field .dropup .dropup input{
+footer .theme .dropup .dropup input{
     background: hsl(100, 0%, 20%);
     /* height: 50%; */
     color: hsl( 0, 0%, 80%);
@@ -210,18 +210,18 @@ footer .field .dropup .dropup input{
     width: 20vh;
 }
 
-footer .field .dropup .dropup div span{
+footer .theme .dropup .dropup div span{
     float: right;
     margin-left: 4px;
     margin-right: 2px;
     color: hsl(0, 60%, 60%);
 }
 
-footer .field .dropup .dropup div{
+footer .theme .dropup .dropup div{
 	display: inline-flex; /*makes × and text stay on the same line*/
 }
 
-footer .field .dropup div.special{
+footer .theme .dropup div.special{
 	background: hsl(-30, 13%, 19%);
     color: hsl(150, 50%, 80%);
 }
@@ -247,7 +247,7 @@ footer .info_block span{
     float: right;
 }
 
-#input_field_word {
+#input_theme_word {
     background: hsl(100, 0%, 20%);
     color: hsl( 0, 0%, 80%);
     font-family: monospace;

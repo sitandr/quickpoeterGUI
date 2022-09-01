@@ -37,8 +37,8 @@ invoke("load_text_file").then((text) => {
 }, (err) => {show_error(err)})
 
 let finder_panel = document.getElementsByClassName("finder_panel")[0];
-let field_button = document.getElementsByClassName("field_button")[0];
-let field_dropup = document.getElementById("field_dropup");
+let theme_button = document.getElementsByClassName("theme_button")[0];
+let theme_dropup = document.getElementById("theme_dropup");
 
 let words_dropup = document.getElementById("words_dropup");
 
@@ -132,43 +132,43 @@ invoke("load_data").then(() => {
 
 render_settings();
 
-let selected_field = null;
-let available_fields;
-invoke("get_available_fields").then((res) => {
+let selected_theme = null;
+let available_themes;
+invoke("get_available_themes").then((res) => {
     res.push("Без поля");
     res.push("Auto");
     res.push("New");
-    available_fields = res;
-    for (const field_name of available_fields){
+    available_themes = res;
+    for (const theme_name of available_themes){
         let d = document.createElement('div');
-        d.appendChild(new Text(field_name))
-        field_dropup.appendChild(d);
+        d.appendChild(new Text(theme_name))
+        theme_dropup.appendChild(d);
         
-        if (field_name == "Без поля"){
+        if (theme_name == "Без поля"){
             d.classList.add("special");
             d.onclick = (e) => {
-                selected_field = null;
-                field_button.textContent = field_name;
-                field_dropup.style.visibility = "hidden";
+                selected_theme = null;
+                theme_button.textContent = theme_name;
+                theme_dropup.style.visibility = "hidden";
             }
         }
-        else if (field_name == "New"){
+        else if (theme_name == "New"){
             d.classList.add("special");
             
             d.onclick = (e) => {
                 swap_visibility(words_dropup);
-                selected_field = field_name;
-                field_button.textContent = 'New'
+                selected_theme = theme_name;
+                theme_button.textContent = 'New'
             }
         }
         else{
-            if (field_name == "Auto"){
+            if (theme_name == "Auto"){
                 d.classList.add("special");
             }
             d.onclick = (e) => {
-                selected_field = field_name;
-                field_button.textContent = field_name;
-                field_dropup.style.visibility = "hidden";
+                selected_theme = theme_name;
+                theme_button.textContent = theme_name;
+                theme_dropup.style.visibility = "hidden";
             }
         }
 
@@ -180,31 +180,31 @@ cur_but.onclick = function (e){
     swap_visibility(choice_but);
 }
 
-field_button.onclick = (e) =>{swap_visibility(field_dropup)};
+theme_button.onclick = (e) =>{swap_visibility(theme_dropup)};
 
 let finder_input = document.getElementsByClassName("finder_input")[0];
 let finder_dropup = document.getElementById("finder_dropup");
-let field_word_input = document.getElementById("input_field_word");
+let theme_word_input = document.getElementById("input_theme_word");
 
-field_word_input.addEventListener('input', (e) => e.target.value = e.target.value.replaceAll(/[^а-яё]/gi, ''));
+theme_word_input.addEventListener('input', (e) => e.target.value = e.target.value.replaceAll(/[^а-яё]/gi, ''));
 
-selected_field_words = [];
-field_word_input.onkeydown = (e) => {
+selected_theme_words = [];
+theme_word_input.onkeydown = (e) => {
     if (e.key == "Enter"){
-        let word = field_word_input.value;
-        selected_field_words.push(word);
+        let word = theme_word_input.value;
+        selected_theme_words.push(word);
 
         let div = document.createElement("div");        
         div.appendChild(new Text(word));
         let close = document.createElement('span');
         close.appendChild(new Text('×'))
         div.appendChild(close);
-        field_word_input.value = '';
-        words_dropup.insertBefore(div, field_word_input);
+        theme_word_input.value = '';
+        words_dropup.insertBefore(div, theme_word_input);
 
         close.onclick = (e) => {
             words_dropup.removeChild(div);
-            selected_field_words.splice(selected_field_words.indexOf(word), 1)
+            selected_theme_words.splice(selected_theme_words.indexOf(word), 1)
             //TODO: remove selected
         }
     }
@@ -214,14 +214,14 @@ let get_rhymes_id_obj;
 let get_rhymes = async function(word, n=100){
     let local_obj = get_rhymes_id_obj = new Object();
     let text;
-    if (selected_field == "New"){
-        text = selected_field_words;
+    if (selected_theme == "New"){
+        text = selected_theme_words;
     }
     else{
         text = ed.text;
     }
 
-    let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_field, "text": text})
+    let result = await invoke("get_rhymes", {"word": word, "topN": n, "mean": selected_theme, "text": text})
     if (local_obj == get_rhymes_id_obj){
         return result;
     }
