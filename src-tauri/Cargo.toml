@@ -30,4 +30,5 @@ serde_yaml = "*"
 default = [ "custom-protocol" ]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
+edit_distances = ["quickpoeter/edit_distances"]
 custom-protocol = [ "tauri/custom-protocol" ]

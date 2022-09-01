@@ -55,7 +55,7 @@ fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>)
                                                     .map_err(|words| format!("Unknown words: {:?}", words))?), &vec![], top_n)
         }
         else{
-            find_from_args(&WC, &MF, &GS.read().unwrap(), Args{to_find: word, field: mean, rps: None, top_n})?
+            find_from_args(&WC, &MF, &GS.read().unwrap(), &Args{to_find: word, field: mean, rps: None, top_n, debug: false})?
         }
         .into_iter().collect()
     )
