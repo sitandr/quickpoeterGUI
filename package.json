@@ -1,5 +1,5 @@
 {
-  "name": "Poet Assistant",
+  "name": "quickpoeter",
   "scripts": {
     "tauri": "tauri"
   },
