@@ -10,13 +10,11 @@ String.prototype.insertAt = function(index, string)
 let readClipText = window.__TAURI__.clipboard.readText;
 let appWindow = window.__TAURI__.window.appWindow;
 
-/*
-appWindow.listen('save', (event) => {
-    console.log("Saving", event)
-})*/ // it was code for menu… Rest in peace.
-
-function swap_visibility(el){
+function swap_visibility(el, hide_others = false){
     if (el.style.visibility == "hidden" || el.style.visibility == ''){
+        if (hide_others){
+            hide_all_dropups();
+        }
         el.style.visibility = "inherit";
     }
     else{
@@ -39,6 +37,7 @@ invoke("load_text_file").then((text) => {
 let finder_panel = document.getElementsByClassName("finder_panel")[0];
 let theme_button = document.getElementsByClassName("theme_button")[0];
 let theme_dropup = document.getElementById("theme_dropup");
+let rhymes_settings_dropup = document.getElementById("rhymes_settings");
 
 let words_dropup = document.getElementById("words_dropup");
 
@@ -49,6 +48,7 @@ function show_error(error_text){
     d.style.color = "red";
     finder_dropup.textContent = '';
     finder_dropup.appendChild(d);
+    hide_all_dropups();
     finder_dropup.style.visibility = "visible";
 }
 
@@ -56,14 +56,16 @@ async function mutate_settings(){
     let sett = await invoke("get_settings");
     for (prop in sett){
         for (subprop in sett[prop]){
-            sett[prop][subprop] = (0.9 + Math.random()/5) * sett[prop][subprop];
+            if (typeof(sett[prop][subprop]) == 'number'){
+                sett[prop][subprop] = (0.9 + Math.random()/5) * sett[prop][subprop];
+            }
         }
     }
     await invoke("save_settings", {"name": "Мутировавшие настройки", "gs": sett});
 }
 
 document.getElementsByClassName("set_rhymes_button")[0].onclick = () => {
-    swap_visibility(document.getElementById("rhymes_settings"))
+    swap_visibility(rhymes_settings_dropup, true)
 };
 
 let current_settings_name = "default";
@@ -177,14 +179,21 @@ invoke("get_available_themes").then((res) => {
 });
 
 cur_but.onclick = function (e){
-    swap_visibility(choice_but);
+    swap_visibility(choice_but, true);
 }
 
-theme_button.onclick = (e) =>{swap_visibility(theme_dropup)};
+theme_button.onclick = (e) =>{swap_visibility(theme_dropup, true)};
 
 let finder_input = document.getElementsByClassName("finder_input")[0];
 let finder_dropup = document.getElementById("finder_dropup");
 let theme_word_input = document.getElementById("input_theme_word");
+
+function hide_all_dropups(){
+    finder_dropup.style.visibility = 'hidden';
+    theme_dropup.style.visibility = 'hidden';
+    rhymes_settings_dropup.style.visibility = 'hidden';
+    choice_but.style.visibility = 'hidden';
+}
 
 theme_word_input.addEventListener('input', (e) => e.target.value = e.target.value.replaceAll(/[^а-яё]/gi, ''));
 
@@ -272,8 +281,7 @@ finder_input.onkeydown = (e) => {
                 }
                 finder_dropup.appendChild(d);
             }
-            finder_dropup.style.visibility = "visible";
-
+            finder_dropup.style.visibility = 'inherit';
         }, (err) => {show_error(err)})
     }
 };
@@ -310,7 +318,7 @@ no_col_but.onclick = (e) => {
 
 document.onkeydown = (e) => {
     if (e.key == "Escape"){
-        swap_visibility(finder_dropup)
+        swap_visibility(finder_dropup, true);
     }
     else if (e.code == "KeyV" && e.altKey){
         // Alt + V — alternative view (squares)

@@ -148,7 +148,12 @@ class colorEditor{
                 
                 // TODO: "deleteContentForward"
                 case "deleteContentForward":
-                    self.deleteLetterForward();
+                    if (self.isSelected()){
+                        self.insertOrReplaceText("");
+                    }
+                    else{
+                        self.deleteLetterForward();
+                    }
                     e.preventDefault();
                 break
 
@@ -212,6 +217,11 @@ class colorEditor{
 
         this.cursorLine += 1;
         this.cursorSymbol = 0;
+    }
+
+    isSelected(){
+        let r = window.getSelection().getRangeAt(0);
+        return !r.collapsed
     }
 
     replaceSelection(newText = ""){
