@@ -31,7 +31,7 @@ lazy_static! {
         let mut path = tauri::api::path::data_dir().unwrap();
         path.push("Quickpoeter");
         let my_dir = path.into_os_string().into_string().unwrap();
-        let _ = std::fs::create_dir_all(&my_dir);
+        std::fs::create_dir_all(&my_dir).unwrap();
         my_dir
     };
     static ref DEFAULT_TEXT_FILE: String = {
@@ -99,8 +99,8 @@ fn load_settings(name: &str) -> Result<(), String>{
         "default" => reader::yaml_read("config/coefficients.yaml")?,
         _ => {
             let mut path = APP_DATA_PATH.clone();
-            path.push('/');
-            path.push_str("config_");
+            path.push_str("/coefficients/");
+            
             path.push_str(name);
             path.push_str(".yaml");
             reader::yaml_read(&*path)?
@@ -117,10 +117,12 @@ fn get_app_data_path() -> &'static str{
 #[command]
 fn get_available_settings() -> Vec<String>{
     let mut res = vec![];
-    for entry in fs::read_dir(APP_DATA_PATH.clone()).expect("Can't access data dir"){
+    let coeff = format!("{}/coefficients", APP_DATA_PATH.as_str());
+    std::fs::create_dir_all(&coeff).map_err(|err| err.to_string()).unwrap();
+    for entry in fs::read_dir(coeff).expect("Can't access data dir"){
         let name = entry.expect("Error at file parsing").file_name().into_string().expect("Not valid UTF in filename");
-        if name.starts_with("config_") && name.ends_with(".yaml"){
-            res.push(name.strip_prefix("config_").unwrap().strip_suffix(".yaml").unwrap().to_string())
+        if name.ends_with(".yaml"){
+            res.push(name.strip_suffix(".yaml").unwrap().to_string())
         }
     }
     res
@@ -128,10 +130,7 @@ fn get_available_settings() -> Vec<String>{
 
 #[command(async)]
 fn save_settings(name: &str, gs: GeneralSettings){
-    let mut path = APP_DATA_PATH.clone();
-    path.push_str("/config_");
-    path.push_str(name);
-    path.push_str(".yaml");
+    let path = format!("{}/coefficients/{}.yaml", APP_DATA_PATH.as_str(), name);
     let buffer = File::create(path).expect("Error while opening settings for writing");
     serde_yaml::to_writer(buffer, &gs).expect("Error while writing");
 }

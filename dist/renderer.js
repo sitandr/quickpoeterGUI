@@ -54,6 +54,7 @@ function show_error(error_text){
 
 async function mutate_settings(){
     let sett = await invoke("get_settings");
+    console.log(sett);
     for (prop in sett){
         for (subprop in sett[prop]){
             if (typeof(sett[prop][subprop]) == 'number'){
@@ -61,6 +62,7 @@ async function mutate_settings(){
             }
         }
     }
+    console.log(sett);
     await invoke("save_settings", {"name": "Мутировавшие настройки", "gs": sett});
 }
 
