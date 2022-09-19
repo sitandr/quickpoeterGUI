@@ -17,7 +17,7 @@ tauri-build = { version = "1.0.3", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "*", features = ["api-all"] }
+tauri = { version = "*", features = ["api-all", "devtools"] } # devtools used only for debug builds
 # for local development
 # quickpoeter = { path = "../../quickpoeter/" }
 quickpoeter = { git = "https://github.com/sitandr/quickpoeter_core" }
