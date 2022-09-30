@@ -4,6 +4,7 @@
 )]
 
 
+use std::path::PathBuf;
 use std::fs;
 // use clap::Parser;
 // use tauri::{CustomMenuItem, Menu, Submenu};
@@ -22,18 +23,28 @@ use quickpoeter::api::{find, find_from_args, Args, string2word};
 
 use lazy_static::lazy_static;
 
+static mut APP_DIR: Option<PathBuf> = None;
+
+macro_rules! get_app_dir {
+    () => {
+        // it is set only one time at app start, so referencing it is actually safe
+        unsafe{
+            APP_DIR.as_ref().expect("Source directory is unknown")
+        }
+    };
+}
 
 lazy_static! {
-    static ref WC: WordCollector = WordCollector::load_default();
-    static ref MF: MeanStrThemes = MeanStrThemes::load_default();
-    static ref GS: RwLock<GeneralSettings> = RwLock::new(GeneralSettings::load_default());
+    static ref WC: WordCollector = WordCollector::load_default(get_app_dir!());
+    static ref MF: MeanStrThemes = MeanStrThemes::load_default(get_app_dir!());
+    static ref GS: RwLock<GeneralSettings> = RwLock::new(GeneralSettings::load_default(get_app_dir!()));
     static ref APP_DATA_PATH: String= {
         let mut path = tauri::api::path::data_dir().unwrap();
         path.push("Quickpoeter");
         let my_dir = path.into_os_string().into_string().unwrap();
         std::fs::create_dir_all(&my_dir).unwrap();
         my_dir
-    };
+    }; 
     static ref DEFAULT_TEXT_FILE: String = {
         let mut path = tauri::api::path::data_dir().unwrap();
         path.push("Quickpoeter");
@@ -199,6 +210,18 @@ fn main() {
         .invoke_handler(tauri::generate_handler![find_stresses, load_data, get_rhymes, get_available_themes,
                                                 load_text_file, save_text_file, get_app_data_path,
                                                 get_settings, load_settings, get_available_settings, save_settings])
+        .setup(|app| {
+
+            // well, I'm quite sure APP_DIR isn't used in time of app creation :)
+            unsafe{
+                APP_DIR = Some(app.path_resolver()
+                  .resource_dir()
+                  .expect("failed to get path"));
+                dbg!(&APP_DIR);
+            }
+
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
