@@ -34,14 +34,25 @@ macro_rules! get_app_dir {
     };
 }
 
+macro_rules! construct_path {
+    ($base: expr, $($dir: expr)*, $file: expr) => {
+        &{
+            let mut b = $base.clone();
+            $(b.push($dir);)*
+            b.push($file);
+            b
+        }
+    };
+}
+
 lazy_static! {
     static ref WC: WordCollector = WordCollector::load_default(get_app_dir!());
     static ref MF: MeanStrThemes = MeanStrThemes::load_default(get_app_dir!());
     static ref GS: RwLock<GeneralSettings> = RwLock::new(GeneralSettings::load_default(get_app_dir!()));
-    static ref APP_DATA_PATH: String= {
+    static ref APP_DATA_PATH: PathBuf= {
         let mut path = tauri::api::path::data_dir().unwrap();
         path.push("Quickpoeter");
-        let my_dir = path.into_os_string().into_string().unwrap();
+        let my_dir = path;
         std::fs::create_dir_all(&my_dir).unwrap();
         my_dir
     }; 
@@ -107,14 +118,12 @@ fn load_data(){
 fn load_settings(name: &str) -> Result<(), String>{
     let mut gs = GS.write().unwrap();
     *gs = match name{
-        "default" => reader::yaml_read("config/coefficients.yaml")?,
+        "default" => reader::yaml_read(
+            construct_path!(get_app_dir!(), "config", "coefficients.yaml"))?,
         _ => {
-            let mut path = APP_DATA_PATH.clone();
-            path.push_str("/coefficients/");
-            
-            path.push_str(name);
-            path.push_str(".yaml");
-            reader::yaml_read(&*path)?
+            reader::yaml_read(
+                construct_path!(APP_DATA_PATH, "coefficients", format!("{}.yaml", name))
+            )?
         }
     };
     Ok(())
@@ -122,13 +131,13 @@ fn load_settings(name: &str) -> Result<(), String>{
 
 #[command]
 fn get_app_data_path() -> &'static str{
-    &*APP_DATA_PATH
+    &*APP_DATA_PATH.to_str().unwrap()
 }
 
 #[command]
 fn get_available_settings() -> Vec<String>{
     let mut res = vec![];
-    let coeff = format!("{}/coefficients", APP_DATA_PATH.as_str());
+    let coeff = construct_path!(APP_DATA_PATH,, "coefficients");
     std::fs::create_dir_all(&coeff).map_err(|err| err.to_string()).unwrap();
     for entry in fs::read_dir(coeff).expect("Can't access data dir"){
         let name = entry.expect("Error at file parsing").file_name().into_string().expect("Not valid UTF in filename");
@@ -141,7 +150,7 @@ fn get_available_settings() -> Vec<String>{
 
 #[command(async)]
 fn save_settings(name: &str, gs: GeneralSettings){
-    let path = format!("{}/coefficients/{}.yaml", APP_DATA_PATH.as_str(), name);
+    let path = construct_path!(APP_DATA_PATH, "coefficients", format!("{}.yaml", name));
     let buffer = File::create(path).expect("Error while opening settings for writing");
     serde_yaml::to_writer(buffer, &gs).expect("Error while writing");
 }

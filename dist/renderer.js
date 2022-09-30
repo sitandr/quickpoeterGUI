@@ -117,6 +117,7 @@ function render_settings(){
         let d = document.createElement("div");
         let b = document.createElement("button");
         b.appendChild(new Text("⚅"));
+        b.title = "Мутировать текущие настройки";
         b.classList.add("random_settings_btn");
         b.titile = "Создать случайные настройки";
         b.onclick = () => {
