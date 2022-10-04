@@ -1,5 +1,9 @@
+import {Colorifier} from '/colorifier.js';
+
+let colorifier = new Colorifier;
+
 // TODO: Сохранение прокрутки
-class colorEditor{
+export class colorEditor{
     
 
     constructor (editor){
@@ -9,7 +13,7 @@ class colorEditor{
         this.cursorLine = 0;
         this.cursorSymbol = 0;
         this.history = [];
-        this.colorify_func = Colorifier.colorify_stresses;
+        this.colorify_func = colorifier.colorify_stresses;
 
         this.widgets = null;
         this.structure_mode = false;

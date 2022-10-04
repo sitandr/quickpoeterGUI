@@ -12,7 +12,7 @@ const PAUSE = /¦/gi;
 //1 РЛНМ П     Ш
 //2        К Х  Ф
 
-alliteration = {
+const alliteration = {
 	"Р": "hsl(160, 80%, 40%)",
 	"Л": "hsl(150, 80%, 40%)",
 	"Н": "hsl(140, 80%, 40%)",
@@ -45,7 +45,7 @@ alliteration = {
 у     ы
 */
 
-assonanses = {
+const assonanses = {
 	"О": "hsl(0, 80%, 70%)",
 	"Ё": "hsl(0, 80%, 70%)",
 	"А": "hsl(30, 80%, 70%)",
@@ -58,11 +58,11 @@ assonanses = {
 	"Ы": "hsl(157, 80%, 65%)",
 }
 
-PRIMARY_STRESS = "hsl(70, 80%, 70%)";
-SECONDARY_STRESS = "hsl(10, 80%, 70%)";
-NO_STRESS = "hsl(150, 70%, 50%)";
-UNKNOWN_STRESS = "hsl(300, 80%, 70%)";
-PAUSE_COLOR = "hsl(280, 60%, 50%)";
+const PRIMARY_STRESS = "hsl(70, 80%, 70%)";
+const SECONDARY_STRESS = "hsl(10, 80%, 70%)";
+const NO_STRESS = "hsl(150, 70%, 50%)";
+const UNKNOWN_STRESS = "hsl(300, 80%, 70%)";
+const PAUSE_COLOR = "hsl(280, 60%, 50%)";
 
 function makeSingle(generator) { // function copied from some site to cancel not actual calls of async
   let globalNonce;
@@ -88,106 +88,112 @@ function makeSingle(generator) { // function copied from some site to cancel not
   };
 }
 
-class Colorifier{
-	static colorify_alliteration = makeSingle(function*(text){
-		let colors = [];
-		for (let i=0; i<text.length; i++){
-			let line = text[i];
-			colors.push(new Array(line.length).fill("inherit"));
-			for (let j=0; j<line.length; j++){
-				let l = line[j].toUpperCase();
-				if (l in alliteration){
-					colors[i][j] = alliteration[l];
-				}
-			}
-		}
-		return colors;
-	});
+export class Colorifier{
+	constructor(){
 
-	static colorify_assonanses = makeSingle(function*(text){
-		let stresses = yield Colorifier.colorify_stresses(text);
-		let colors = [];
-		for (let i=0; i<text.length; i++){
-			let line = text[i];
-			colors.push(new Array(line.length).fill("inherit"));
-			for (let j=0; j<line.length; j++){
-				let l = line[j].toUpperCase();
-
-				if (l == 'О' && stresses[i][j] == NO_STRESS){
-					l = 'А';
-				}
-				if (l in assonanses){
-					colors[i][j] = assonanses[l];
-				}
-			}
-		}
-		return colors;
-	});
-
-	static colorify_stresses = makeSingle(function*(text){
-		let colors = [];
-		for (let i=0; i<text.length; i++){
-			let line = text[i];
-			colors.push(new Array(line.length).fill("inherit"));
-			let pauses_m = line.matchAll(PAUSE);
-			for (const match of pauses_m){
-				colors[i][match.index] = PAUSE_COLOR;
-			}
-			let word_matches = Array.from(line.matchAll(WORD));
-			let all_stresses = yield invoke("find_stresses", {"words":
-											 word_matches.map((m) => 
-											 m[0].replace(/[›‹¦]/g, ""))});
-
-			for (let ind = 0; ind < all_stresses.length; ind++){
-				let match = word_matches[ind];
-				let stresses = all_stresses[ind];
-				let word = match[0];
-
-				if (word.length == 0){
-					continue;
-				}
-
-				let vowels = Array.from(word.matchAll(VOWEL));
-				let user_stressed = word.includes("́")
-
-				let j = 0;
-
-				for (const v_match of vowels){
-					let v = v_match[0];
-					
-					let col = NO_STRESS;
-
-					if (user_stressed){
-						if (word[v_match.index + 1] == "́"){
-							col = PRIMARY_STRESS;
-						}
+		let self = this;
+		
+		this.colorify_alliteration = makeSingle(function*(text){
+			let colors = [];
+			for (let i=0; i<text.length; i++){
+				let line = text[i];
+				colors.push(new Array(line.length).fill("inherit"));
+				for (let j=0; j<line.length; j++){
+					let l = line[j].toUpperCase();
+					if (l in alliteration){
+						colors[i][j] = alliteration[l];
 					}
-					else if (vowels.length == 1){
-						col = SECONDARY_STRESS;
+				}
+			}
+			return colors;
+		});
+
+		this.colorify_assonanses = makeSingle(function*(text){
+			console.log(self);
+			let stresses = yield self.colorify_stresses(text);
+			let colors = [];
+			for (let i=0; i<text.length; i++){
+				let line = text[i];
+				colors.push(new Array(line.length).fill("inherit"));
+				for (let j=0; j<line.length; j++){
+					let l = line[j].toUpperCase();
+
+					if (l == 'О' && stresses[i][j] == NO_STRESS){
+						l = 'А';
 					}
-					else{
-						if (word[v_match.index] == "ё"){
-							col = PRIMARY_STRESS;
+					if (l in assonanses){
+						colors[i][j] = assonanses[l];
+					}
+				}
+			}
+			return colors;
+		});
+
+		this.colorify_stresses = makeSingle(function*(text){
+			let colors = [];
+			for (let i=0; i<text.length; i++){
+				let line = text[i];
+				colors.push(new Array(line.length).fill("inherit"));
+				let pauses_m = line.matchAll(PAUSE);
+				for (const match of pauses_m){
+					colors[i][match.index] = PAUSE_COLOR;
+				}
+				let word_matches = Array.from(line.matchAll(WORD));
+				let all_stresses = yield invoke("find_stresses", {"words":
+												 word_matches.map((m) => 
+												 m[0].replace(/[›‹¦]/g, ""))});
+
+				for (let ind = 0; ind < all_stresses.length; ind++){
+					let match = word_matches[ind];
+					let stresses = all_stresses[ind];
+					let word = match[0];
+
+					if (word.length == 0){
+						continue;
+					}
+
+					let vowels = Array.from(word.matchAll(VOWEL));
+					let user_stressed = word.includes("́")
+
+					let j = 0;
+
+					for (const v_match of vowels){
+						let v = v_match[0];
+						
+						let col = NO_STRESS;
+
+						if (user_stressed){
+							if (word[v_match.index + 1] == "́"){
+								col = PRIMARY_STRESS;
+							}
 						}
-						else if (stresses == null){
-							col = UNKNOWN_STRESS;
-						}
-						else if (j == stresses[0]){
-							col = PRIMARY_STRESS;
-						}
-						else if (j == stresses[1]){
+						else if (vowels.length == 1){
 							col = SECONDARY_STRESS;
 						}
-					}
+						else{
+							if (word[v_match.index] == "ё"){
+								col = PRIMARY_STRESS;
+							}
+							else if (stresses == null){
+								col = UNKNOWN_STRESS;
+							}
+							else if (j == stresses[0]){
+								col = PRIMARY_STRESS;
+							}
+							else if (j == stresses[1]){
+								col = SECONDARY_STRESS;
+							}
+						}
 
-					let c_lett_num = match.index + v_match.index;
-					colors[i][c_lett_num] = col;
-					j++;
-				}
-			} 
-		}
-		return colors;
-	});
+						let c_lett_num = match.index + v_match.index;
+						colors[i][c_lett_num] = col;
+						j++;
+					}
+				} 
+			}
+			return colors;
+		});
+	}
 }
 
 /*Colorifier.colorify_assonanses = makeSingle(Colorifier.colorify_assonanses);
