@@ -1,12 +1,18 @@
 /*import { clipboard } from 'electron';
 const {execSync} = require('child_process');*/
+import {Colorifier} from '/colorifier.js';
+
+let colorifier = new Colorifier;
+
 
 String.prototype.insertAt = function(index, string)
 {   
   return this.substr(0, index) + string + this.substr(index);
 }
 
+import {colorEditor} from '/editor.js';
 
+const invoke = window.__TAURI__.invoke;
 let readClipText = window.__TAURI__.clipboard.readText;
 let appWindow = window.__TAURI__.window.appWindow;
 
@@ -55,8 +61,8 @@ function show_error(error_text){
 async function mutate_settings(){
     let sett = await invoke("get_settings");
     console.log(sett);
-    for (prop in sett){
-        for (subprop in sett[prop]){
+    for (let prop in sett){
+        for (let subprop in sett[prop]){
             if (typeof(sett[prop][subprop]) == 'number'){
                 sett[prop][subprop] = (0.9 + Math.random()/5) * sett[prop][subprop];
             }
@@ -200,7 +206,7 @@ function hide_all_dropups(){
 
 theme_word_input.addEventListener('input', (e) => e.target.value = e.target.value.replaceAll(/[^а-яё]/gi, ''));
 
-selected_theme_words = [];
+let selected_theme_words = [];
 theme_word_input.onkeydown = (e) => {
     if (e.key == "Enter"){
         let word = theme_word_input.value;
@@ -256,7 +262,6 @@ finder_input.onkeydown = (e) => {
                 d.appendChild(new Text(word.word.replace("'", "́").replace("`", "")));
 
                 d.onmouseenter = (e) => {
-                    console.log("Entered")
                     info_block.innerHTML = '';
                     info_block.style.visibility = "inherit";
                     let word_prop = (s) => {return Math.round(word[s]*1_000)/1_000};
@@ -271,7 +276,7 @@ finder_input.onkeydown = (e) => {
 
                     info_block.appendChild(div_create("dist")); // distance should be the first
 
-                    for (prop in word){
+                    for (let prop in word){
                         if (prop == "word" || prop == "dist"){
                             continue;
                         }
@@ -296,19 +301,19 @@ let stress_but = document.getElementById("stress_but");
 let no_col_but = document.getElementById("no_col_but");
 
 asson_but.onclick = (e) => {
-    ed.colorify_func = Colorifier.colorify_assonanses;
+    ed.colorify_func = colorifier.colorify_assonanses;
     ed.editorUPD();
     cur_but.firstChild.data = "Ассонансы";
 };
 
 allit_but.onclick = (e) => {
-    ed.colorify_func = Colorifier.colorify_alliteration;
+    ed.colorify_func = colorifier.colorify_alliteration;
     ed.editorUPD();
     cur_but.firstChild.data = "Аллитерация";
 };
 
 stress_but.onclick = (e) => {
-    ed.colorify_func = Colorifier.colorify_stresses;
+    ed.colorify_func = colorifier.colorify_stresses;
     ed.editorUPD();
     cur_but.firstChild.data = "Ударения";
 };
