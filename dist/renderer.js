@@ -4,12 +4,6 @@ import {Colorifier} from '/colorifier.js';
 
 let colorifier = new Colorifier;
 
-
-String.prototype.insertAt = function(index, string)
-{   
-  return this.substr(0, index) + string + this.substr(index);
-}
-
 import {colorEditor} from '/editor.js';
 
 const invoke = window.__TAURI__.invoke;
