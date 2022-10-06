@@ -1,4 +1,10 @@
 import {Colorifier} from '/colorifier.js';
+let readClipText = window.__TAURI__.clipboard.readText;
+
+String.prototype.insertAt = function(index, string)
+{   
+  return this.substr(0, index) + string + this.substr(index);
+}
 
 let colorifier = new Colorifier;
 
