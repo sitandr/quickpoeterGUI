@@ -452,7 +452,7 @@ export class colorEditor{
 
         if (obj.tagName === 'SPAN'){
             cursorSymb = Array.from(obj.parentNode.childNodes).indexOf(obj) + 1;
-            obj = obj.parentNode;
+            obj = obj.parentNode; // no move to divs
         }
         else{
             cursorSymb = 0;
@@ -474,13 +474,9 @@ export class colorEditor{
     safeSelectionAt(startContainer, offset){
         let sel = window.getSelection();
 
-        if (sel.rangeCount){
-            sel.getRangeAt(0).setStart(startContainer, offset);
-        }
-        else{
-            let r = new Range();
-            r.setStart(startContainer, offset);
-            sel.addRange(r);
-        }
+        sel.removeAllRanges();
+        let r = new Range();
+        r.setStart(startContainer, offset);
+        sel.addRange(r);
     }
 }
