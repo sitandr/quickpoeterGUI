@@ -8,6 +8,8 @@ String.prototype.insertAt = function(index, string)
 
 let colorifier = new Colorifier;
 
+const SPECIAL_LETTERS = "¦́‹›";
+
 // TODO: Сохранение прокрутки
 export class colorEditor{
     
@@ -173,8 +175,19 @@ export class colorEditor{
                     e.preventDefault();
                 break
 
+                case "deleteWordBackward":
+                    if (self.isSelected()){
+                        self.insertOrReplaceText("");
+                    }
+                    else{
+                        self.deleteWordBackward();
+                    }
+                    e.preventDefault();
+                break
+
                 default:
                     console.log("Unknown event:", e);
+                    e.preventDefault();
             }
             self.editorUPD();
             });
@@ -290,6 +303,16 @@ export class colorEditor{
             this.text[this.cursorLine] = this.text[this.cursorLine].slice(0, this.cursorSymbol - 1) + this.text[this.cursorLine].slice(this.cursorSymbol);
             this.cursorSymbol--;
         }
+    }
+
+    deleteWordBackward(){
+        while(this.cursorSymbol > 0 && this.isCharLetter(this.text[this.cursorLine][this.cursorSymbol - 1])){
+            this.deleteLetterBackward();
+        }
+    }
+
+    isCharLetter(char) {
+        return char.toLowerCase() != char.toUpperCase() || SPECIAL_LETTERS.indexOf(char) > -1
     }
 
     deleteLetterForward(){
