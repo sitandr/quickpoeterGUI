@@ -1,7 +1,14 @@
 div.editor {
-	overflow: auto;
+	/* overflow: auto; */
 /*	scroll-behavior: smooth; */
-	height: 93vh;
+    bottom: 30px;
+    top: 0;
+    position: absolute;
+    overflow-y: auto;
+    left: 0;
+    right: 0;
+
+	/* height: 93vh; */
     padding: 5px;
 	outline: none;
 	background: hsl(100, 0%, 20%);
@@ -12,6 +19,21 @@ div.editor {
 
 .editor>div {
 	padding: 3px;
+}
+
+.editor::-webkit-scrollbar {
+    width: 7px;
+}
+.editor::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+    background: hsl(80, 25%, 55%);
+    /* -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 50%); */
+}
+.editor::-webkit-scrollbar-track {
+    /* -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%); */
+    /* -webkit-border-radius: 10px; */
+    border-radius: 10px;
 }
 /*
 input.user_input {
@@ -38,14 +60,17 @@ span{
 }
 
 footer{
-	position: fixed;
+	position: absolute;
     bottom: 0;
     width: 100%;
-    height: 6vh;
+    height: 30px;
     background-color: hsl(0,0%,30%);
     color: hsl( 0, 0%, 80%);
     font-family: monospace;
     font-size: 1.5em;
+    padding-bottom: 2px;
+    overflow-x: clip;
+    overflow-y: visible;
 }
 
 footer>.status{
@@ -60,7 +85,7 @@ footer .finder_panel{
 
 footer .finder{
     display: inline-block;
-    width: 30vh;
+    width: 30vw;
 }
 
 footer .finder .finder_input {
@@ -75,7 +100,7 @@ footer .finder .finder_input {
 
 footer .dropup{
     position: absolute;
-    bottom: 7vh;
+    bottom: 33px;
     background: hsl(40, 20%, 25%);
 }
 
@@ -97,6 +122,7 @@ footer>.buttons{
     display: flex;
     max-block-size: -webkit-fill-available;
     flex-direction: column-reverse;
+    margin-right: 2vw;
 }
 
 footer .theme{
@@ -197,7 +223,7 @@ footer .buttons button{
 
 footer .theme .dropup .dropup{
 	left: 103%;
-    margin-bottom: -50%;
+    margin-bottom: -37%;
 	width: fit-content;
 }
 

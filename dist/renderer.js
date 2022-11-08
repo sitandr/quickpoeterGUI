@@ -10,6 +10,7 @@ const invoke = window.__TAURI__.invoke;
 let readClipText = window.__TAURI__.clipboard.readText;
 let appWindow = window.__TAURI__.window.appWindow;
 
+
 function swap_visibility(el, hide_others = false){
     if (el.style.visibility == "hidden" || el.style.visibility == ''){
         if (hide_others){
@@ -318,7 +319,7 @@ no_col_but.onclick = (e) => {
     cur_but.firstChild.data = "Без подсветки";
 }
 
-document.onkeydown = (e) => {
+document.onkeydown = async (e) => {
     if (e.key == "Escape"){
         swap_visibility(finder_dropup, true);
     }
@@ -329,6 +330,10 @@ document.onkeydown = (e) => {
     }
     else if (e.code == "KeyS" && e.ctrlKey){
         invoke("save_text_file", {'text': ed.text}).then(undefined, (err) => {show_error(err)})
+    }
+    else if (e.code == "F11"){
+        let isFull = await appWindow.isFullscreen();
+        await appWindow.setFullscreen(!isFull);
     }
 };
 window.__TAURI__.window.appWindow.once('tauri://close-requested',
