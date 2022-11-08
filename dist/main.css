@@ -191,6 +191,16 @@ footer .set_rhymes .random_settings_btn{
     float: right;
 }
 
+footer .set_rhymes .open_folder_btn{
+    font-size: 1em;
+    padding: 2px;
+    padding-top: 3px;
+    margin-top: 1px;
+    padding-inline: 1px;
+    line-height: 0.8;
+    float: right;
+}
+
 #rhymes_settings{
     visibility: hidden;
     background: hsl(50, 20%, 11%);

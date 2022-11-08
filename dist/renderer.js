@@ -59,12 +59,12 @@ async function mutate_settings(){
     for (let prop in sett){
         for (let subprop in sett[prop]){
             if (typeof(sett[prop][subprop]) == 'number'){
-                sett[prop][subprop] = (0.9 + Math.random()/5) * sett[prop][subprop];
+                sett[prop][subprop] = (1 + (Math.random() - 0.5)/2) * sett[prop][subprop];
             }
         }
     }
     console.log(sett);
-    await invoke("save_settings", {"name": "Мутировавшие настройки", "gs": sett});
+    await invoke("save_settings", {"name": current_settings_name + " ⚅", "gs": sett});
 }
 
 document.getElementsByClassName("set_rhymes_button")[0].onclick = () => {
@@ -75,6 +75,12 @@ let current_settings_name = "default";
 
 async function load_settings(name){
     await invoke("load_settings", {"name": name}).then(null, (err) => show_error(err));
+}
+
+async function open_settings_folder(){
+    let path = await invoke("get_app_data_path");
+    let open = window.__TAURI__.shell.open;
+    open(path);
 }
 
 function render_settings(){
@@ -120,11 +126,19 @@ function render_settings(){
         b.appendChild(new Text("⚅"));
         b.title = "Мутировать текущие настройки";
         b.classList.add("random_settings_btn");
-        b.titile = "Создать случайные настройки";
+
         b.onclick = () => {
             mutate_settings().then(() => {render_settings()});
         }
         d.appendChild(b)
+
+        b = document.createElement("button");
+        b.appendChild(new Text("📂"));
+        b.title = "Открыть папку настроек";
+        b.classList.add("open_folder_btn");
+        b.onclick = () => open_settings_folder();
+        d.appendChild(b)
+
         rhymes_settings.appendChild(d);
     })
 }
