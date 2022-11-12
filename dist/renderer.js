@@ -333,6 +333,20 @@ no_col_but.onclick = (e) => {
     cur_but.firstChild.data = "Без подсветки";
 }
 
+document.getElementsByClassName("structure_button")[0].onclick = (e) => {
+	ed.structure_mode = !ed.structure_mode;
+    ed.editorUPD();
+}
+
+document.getElementsByClassName("set_stress_button")[0].onclick = (e) => {
+	ed.addStress();
+}
+
+/*document.getElementByClass("full_screen_button")[0].onclick() => {
+	let isFull = await appWindow.isFullscreen();
+    await appWindow.setFullscreen(!isFull);
+}*/
+
 document.onkeydown = async (e) => {
     if (e.key == "Escape"){
         swap_visibility(finder_dropup, true);

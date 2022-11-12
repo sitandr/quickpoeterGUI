@@ -1,4 +1,4 @@
-import {Colorifier} from '/colorifier.js';
+import {Colorifier, assonanses} from '/colorifier.js';
 let readClipText = window.__TAURI__.clipboard.readText;
 
 String.prototype.insertAt = function(index, string)
@@ -10,9 +10,22 @@ let colorifier = new Colorifier;
 
 const SPECIAL_LETTERS = "¦́‹›";
 
-// TODO: Сохранение прокрутки
 export class colorEditor{
     
+    addStress(){
+    	let sel = window.getSelection();
+		if (sel){
+        	let r = sel.getRangeAt(0);
+            this.getCoord(r.startContainer, true);
+            if (r.startOffset == 0||r.startContainer.text == ""){
+            	return; // first symbol, can't add it there
+            }
+            if (this.text[this.cursorLine][this.cursorSymbol - 1] != undefined && this.text[this.cursorLine][this.cursorSymbol - 1].toUpperCase() in assonanses) {
+            	this.insertPlainText("́");
+                this.editorUPD();
+            }
+        }
+    }
 
     constructor (editor){
 
@@ -41,18 +54,7 @@ export class colorEditor{
             }
             else if (e.keyCode == 222 && e.ctrlKey){
                 // Ctrl + ` — adding stress
-                let sel = window.getSelection();
-                if (sel){
-                    let r = sel.getRangeAt(0);
-                    self.getCoord(r.startContainer, true);
-                    if (r.startOffset == 0||r.startContainer.text == ""){
-                        return; // first symbol, can't add it there
-                    }
-                    if (self.text[self.cursorLine][self.cursorSymbol - 1] != undefined && self.text[self.cursorLine][self.cursorSymbol - 1].toUpperCase() in assonanses) {
-                        self.insertPlainText("́");
-                        self.editorUPD();
-                    }
-                }
+                self.addStress();
             }
             else if (e.code == "Space" && e.ctrlKey){
                 // Ctrl + Space — adding pause

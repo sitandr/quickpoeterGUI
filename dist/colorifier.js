@@ -45,7 +45,7 @@ const alliteration = {
 у     ы
 */
 
-const assonanses = {
+export const assonanses = {
 	"О": "hsl(0, 80%, 70%)",
 	"Ё": "hsl(0, 80%, 70%)",
 	"А": "hsl(30, 80%, 70%)",

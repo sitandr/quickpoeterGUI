@@ -21,6 +21,10 @@ div.editor {
 	padding: 3px;
 }
 
+body::-webkit-scrollbar {
+    display: none;
+}
+
 .editor::-webkit-scrollbar {
     width: 7px;
 }
@@ -49,9 +53,10 @@ div.output {
 }*/
 
 body{
-	-ms-overflow-style: scrollbar;
 	-webkit-app-region: drag;
 	margin: 0px;
+	overflow-y: visible;
+	background: hsl(0,0%,30%);
 }
 
 span{
@@ -102,6 +107,7 @@ footer .dropup{
     position: absolute;
     bottom: 33px;
     background: hsl(40, 20%, 25%);
+    z-index: 5;
 }
 
 #finder_dropup{
@@ -230,6 +236,39 @@ footer .buttons button{
     font-family: monospace;
 }
 
+/*footer .full_screen_button{
+   	padding: 3px 6px 6px 6px;
+	margin: 4px;
+	color: hsl(0, 0%, 20%);
+	border-width: 0px;
+	font-size: 0.9em;
+	border-radius: 30%;
+	font-family: monospace;
+	margin-left: 3px;
+}*/
+
+footer .set_stress_button{
+	padding: 3px 6px 6px 6px;
+	margin: 4px;
+	color: hsl(0, 0%, 20%);
+	border-width: 0px;
+	font-size: 0.9em;
+	border-radius: 30%;
+	font-family: monospace;
+	margin-left: 3px;
+}
+
+footer .structure_button{
+   padding: 6px 5px 6px 5px;
+	margin: 4px;
+	color: hsl(0, 0%, 20%);
+	border-width: 0px;
+	font-size: 0.7em;
+	border-radius: 30%;
+	font-family: monospace;
+	float: right;
+	margin-left: 3px;
+}
 
 footer .theme .dropup .dropup{
 	left: 103%;
