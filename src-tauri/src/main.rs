@@ -70,11 +70,11 @@ lazy_static! {
 fn get_rhymes(word: String, top_n: u32, mean: Option<String>, text: Vec<String>) -> Result<Vec<WordDistanceResult<'static>>, String>{
     Ok(
         if mean == Some("Auto".to_string()){
-            find(&WC, &GS.read().unwrap(), string2word(&WC, &word)?, MeanTheme::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)
+            find(&WC, &GS.read().unwrap(), string2word(&WC, &word)?, MeanTheme::from_strings_filter(&WC, &select_words_from_text(text)).as_ref(), &vec![], top_n)?
         }
         else if mean == Some("New".to_string()){
             find(&WC, &GS.read().unwrap(), string2word(&WC, &word)?, Some(&MeanTheme::from_str(&WC, &text.iter().map(|s| &**s).collect())
-                                                    .map_err(|words| format!("Unknown words: {:?}", words))?), &vec![], top_n)
+                                                    .map_err(|words| format!("Unknown words: {:?}", words))?), &vec![], top_n)?
         }
         else{
             find_from_args(&WC, &MF, &GS.read().unwrap(), &Args{to_find: word, theme: mean, rps: None, top_n, debug: false, measure: None})?
