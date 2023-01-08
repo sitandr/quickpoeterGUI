@@ -25,7 +25,7 @@ const HELP_TEXT = 'Кнопка справа выбирает стиль под�
 <b>Ctrl + ></b> — увеличить длину слога <br>\
 <b>Alt + V</b> — переключиться в структурный вид <br>\
 <b>Esc</b> — спрятать/показать поле поиска рифмы <br>\
-Обратная связь: <a href="mailto:andr−sitnikov@mail.ru">andr−sitnikov@mail.ru</a>, <a href="github.com/sitandr/quickpoeterUI">GitHub</a>\
+Обратная связь: <a href="mailto:andr−sitnikov@mail.ru">andr−sitnikov@mail.ru</a>, <a target="_blank" rel="noopener noreferrer" href="https://github.com/sitandr/quickpoeterUI">GitHub</a>\
 '
 
 function swap_visibility(el, hide_others = false){
