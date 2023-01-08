@@ -121,6 +121,18 @@ footer .finder .dropup div{
     background: hsl(50, 25%, 30%);
 }
 
+footer .finder .dropup span{
+    color: hsl(0, 0%, 80%);
+}
+
+footer .finder .dropup span a{
+    color: deepskyblue;
+}
+
+footer .finder .dropup span b{
+    color: hsl(200, 30%, 60%);
+}
+
 footer>.buttons{
     float: right;
     padding: 0px;
@@ -147,6 +159,10 @@ footer .theme .dropup div{
 	color: hsl(200, 50%, 90%);
     padding-right: 4px;
     padding-left: 4px;
+}
+
+footer .theme .dropup div.selected{
+    border: 3px solid hsl(40, 40%, 70%);
 }
 
 footer .theme button{
@@ -268,6 +284,17 @@ footer .structure_button{
 	font-family: monospace;
 	float: right;
 	margin-left: 3px;
+}
+
+footer .help_button{
+    padding: 3px 6px 6px 6px;
+    margin: 4px;
+    color: hsl(0, 0%, 20%);
+    border-width: 0px;
+    font-size: 0.9em;
+    border-radius: 30%;
+    font-family: monospace;
+    margin-left: 3px;
 }
 
 footer .theme .dropup .dropup{

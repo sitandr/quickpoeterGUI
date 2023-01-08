@@ -11,6 +11,23 @@ let readClipText = window.__TAURI__.clipboard.readText;
 let appWindow = window.__TAURI__.window.appWindow;
 
 
+const HELP_TEXT = 'Кнопка справа выбирает стиль подсветки. Можно подсветить ударные слоги, ассонансы и аллитерации.\
+ Первые рекомендуется использовать вместе со структурным видом.<br>\
+Используйте поле ввода слева для поиска рифмы к слову. Можно использовать паттерны, например, "++!"\
+ для поиска трёхсложного слова с ударением на последнем слоге, или "++о\'й"  для таких слов, заканчивающихся на \"-ой\."\
+ Вы можете выбрать смысл подбираемой рифмы. <b>Auto</b> создает смысл по текущему стиху, <b>New</b> позволяет создать собственный смысл\
+ по характерным словам.\
+<br>\
+Горячие клавиши:<br>\
+<b>Ctrl + \'</b> — поставить ударение <br>\
+<b>Ctrl + Space</b> — добавить паузу <br>\
+<b>Ctrl + <</b> — уменьшить длину слога <br>\
+<b>Ctrl + ></b> — увеличить длину слога <br>\
+<b>Alt + V</b> — переключиться в структурный вид <br>\
+<b>Esc</b> — спрятать/показать поле поиска рифмы <br>\
+Обратная связь: <a href="mailto:andr−sitnikov@mail.ru">andr−sitnikov@mail.ru</a>, <a href="github.com/sitandr/quickpoeterUI">GitHub</a>\
+'
+
 function swap_visibility(el, hide_others = false){
     if (el.style.visibility == "hidden" || el.style.visibility == ''){
         if (hide_others){
@@ -51,6 +68,14 @@ function show_error(error_text){
     finder_dropup.appendChild(d);
     hide_all_dropups();
     finder_dropup.style.visibility = "visible";
+}
+
+function show_help(){
+    let d = document.createElement("span");
+    d.innerHTML = HELP_TEXT;
+    finder_dropup.textContent = '';
+    finder_dropup.appendChild(d);
+    swap_visibility(finder_dropup);
 }
 
 async function mutate_settings(){
@@ -154,8 +179,16 @@ render_settings();
 
 let selected_theme = null;
 let available_themes;
+let last_selected_theme = null;
+
+function changeSelectedTheme(new_theme){
+    last_selected_theme.classList.remove('selected')
+    last_selected_theme = new_theme;
+    last_selected_theme.classList.add('selected')
+}
+
 invoke("get_available_themes").then((res) => {
-    res.push("Без поля");
+    res.push("Без смысла");
     res.push("Auto");
     res.push("New");
     available_themes = res;
@@ -164,12 +197,18 @@ invoke("get_available_themes").then((res) => {
         d.appendChild(new Text(theme_name))
         theme_dropup.appendChild(d);
         
-        if (theme_name == "Без поля"){
+        if (theme_name == "Без смысла"){
             d.classList.add("special");
+
+            last_selected_theme = d;
+            d.classList.add("selected");
+
             d.onclick = (e) => {
                 selected_theme = null;
+
+                changeSelectedTheme(d)
                 theme_button.textContent = theme_name;
-                theme_dropup.style.visibility = "hidden";
+                swap_visibility(theme_dropup);
             }
         }
         else if (theme_name == "New"){
@@ -177,8 +216,10 @@ invoke("get_available_themes").then((res) => {
             
             d.onclick = (e) => {
                 swap_visibility(words_dropup);
+                changeSelectedTheme(d)
+
                 selected_theme = theme_name;
-                theme_button.textContent = 'New'
+                theme_button.textContent = theme_name
             }
         }
         else{
@@ -186,9 +227,11 @@ invoke("get_available_themes").then((res) => {
                 d.classList.add("special");
             }
             d.onclick = (e) => {
+                changeSelectedTheme(d)
+
                 selected_theme = theme_name;
                 theme_button.textContent = theme_name;
-                theme_dropup.style.visibility = "hidden";
+                swap_visibility(theme_dropup);
             }
         }
 
@@ -340,6 +383,10 @@ document.getElementsByClassName("structure_button")[0].onclick = (e) => {
 
 document.getElementsByClassName("set_stress_button")[0].onclick = (e) => {
 	ed.addStress();
+}
+
+document.getElementsByClassName("help_button")[0].onclick = (e) => {
+    show_help();
 }
 
 /*document.getElementByClass("full_screen_button")[0].onclick() => {
