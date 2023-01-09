@@ -1,5 +1,3 @@
-/*import { clipboard } from 'electron';
-const {execSync} = require('child_process');*/
 import {Colorifier} from '/colorifier.js';
 
 let colorifier = new Colorifier;
@@ -14,19 +12,20 @@ let appWindow = window.__TAURI__.window.appWindow;
 const HELP_TEXT = 'Кнопка справа выбирает стиль подсветки. Можно подсветить ударные слоги, ассонансы и аллитерации.\
  Первые рекомендуется использовать вместе со структурным видом.<br>\
 Используйте поле ввода слева для поиска рифмы к слову. Можно использовать паттерны, например, "++!"\
- для поиска трёхсложного слова с ударением на последнем слоге, или "++о\'й"  для таких слов, заканчивающихся на \"-ой\."\
- Вы можете выбрать смысл подбираемой рифмы. <b>Auto</b> создает смысл по текущему стиху, <b>New</b> позволяет создать собственный смысл\
+ для поиска трёхсложного слова с ударением на последнем слоге, или "++о\'й"  для таких слов, заканчивающихся на "-ой".\
+ Вы можете выбрать смысловую тему подбираемой рифмы. <b>Auto</b> задаёт смысл по текущему стиху, <b>New</b> позволяет создать собственный смысл\
  по характерным словам.\
 <br>\
 Горячие клавиши:<br>\
-<b>Ctrl + \'</b> — поставить ударение <br>\
-<b>Ctrl + Space</b> — добавить паузу <br>\
-<b>Ctrl + <</b> — уменьшить длину слога <br>\
-<b>Ctrl + ></b> — увеличить длину слога <br>\
+<b>Ctrl + \'</b> — поставить(уточнить) ударение (можно ставить несколько на одно слово)<br>\
+<b>Ctrl + Space</b> — добавить паузу в ритм<br>\
+<b>Ctrl + <</b> — уменьшить произносимую длину слога <br>\
+<b>Ctrl + ></b> — увеличить произносимую длину слога <br>\
 <b>Alt + V</b> — переключиться в структурный вид <br>\
 <b>Esc</b> — спрятать/показать поле поиска рифмы <br>\
-Обратная связь: <a href="mailto:andr−sitnikov@mail.ru">andr−sitnikov@mail.ru</a>, <a target="_blank" rel="noopener noreferrer" href="https://github.com/sitandr/quickpoeterUI">GitHub</a>\
-'
+<b>F11</b> — полноэкранный режим <br>\
+Обратная связь: <a href="mailto:andr−sitnikov@mail.ru">andr−sitnikov@mail.ru</a>, <a target="_blank" rel="noopener noreferrer" href="https://github.com/sitandr/quickpoeterGUI">GitHub</a>\
+' // using html string isn't good, but is convinient for inserting text in corresponding place 
 
 function swap_visibility(el, hide_others = false){
     if (el.style.visibility == "hidden" || el.style.visibility == ''){
