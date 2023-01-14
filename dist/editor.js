@@ -14,7 +14,7 @@ export class colorEditor{
     
     addStress(){
     	let sel = window.getSelection();
-		if (sel){
+		if (sel.rangeCount){
         	let r = sel.getRangeAt(0);
             this.getCoord(r.startContainer, true);
             if (r.startOffset == 0||r.startContainer.text == ""){

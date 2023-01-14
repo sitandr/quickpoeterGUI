@@ -27,17 +27,6 @@ const HELP_TEXT = 'Кнопка справа выбирает стиль под�
 Обратная связь: <a href="mailto:andr−sitnikov@mail.ru">andr−sitnikov@mail.ru</a>, <a target="_blank" rel="noopener noreferrer" href="https://github.com/sitandr/quickpoeterGUI">GitHub</a>\
 ' // using html string isn't good, but is convinient for inserting text in corresponding place 
 
-function swap_visibility(el, hide_others = false){
-    if (el.style.visibility == "hidden" || el.style.visibility == ''){
-        if (hide_others){
-            hide_all_dropups();
-        }
-        el.style.visibility = "inherit";
-    }
-    else{
-        el.style.visibility = "hidden";
-    }
-}
 
 let cur_but = document.getElementsByClassName("current_but")[0];
 let choice_but = document.getElementsByClassName("choice_but")[0];
@@ -59,6 +48,19 @@ let rhymes_settings_dropup = document.getElementById("rhymes_settings");
 let words_dropup = document.getElementById("words_dropup");
 
 
+function swap_visibility(el, hide_others = false){
+    if (el.style.visibility == "hidden" || el.style.visibility == ''){
+        if (hide_others){
+            hide_all_dropups();
+        }
+        el.style.visibility = "inherit";
+    }
+    else{
+        el.style.visibility = "hidden";
+    }
+    ed.editorUPD();
+}
+
 function show_error(error_text){
     let d = document.createElement("span");
     d.appendChild(new Text(error_text));
@@ -66,7 +68,7 @@ function show_error(error_text){
     finder_dropup.textContent = '';
     finder_dropup.appendChild(d);
     hide_all_dropups();
-    finder_dropup.style.visibility = "visible";
+    swap_visibility(finder_dropup);
 }
 
 function show_help(){
@@ -172,6 +174,7 @@ function render_settings(){
 invoke("load_data").then(() => {
     status_bar.remove();
     finder_panel.style.visibility = "visible";
+    ed.editorUPD();
 });
 
 render_settings();
@@ -232,9 +235,7 @@ invoke("get_available_themes").then((res) => {
                 theme_button.textContent = theme_name;
                 swap_visibility(theme_dropup);
             }
-        }
-
-            
+        } 
     }
 });
 
@@ -253,6 +254,7 @@ function hide_all_dropups(){
     theme_dropup.style.visibility = 'hidden';
     rhymes_settings_dropup.style.visibility = 'hidden';
     choice_but.style.visibility = 'hidden';
+    ed.editorUPD();
 }
 
 theme_word_input.addEventListener('input', (e) => e.target.value = e.target.value.replaceAll(/[^а-яё]/gi, ''));
@@ -322,6 +324,7 @@ finder_input.onkeydown = (e) => {
                         let s = document.createElement("span");
                         s.appendChild(new Text(word_prop(prop)));
                         d.appendChild(s);
+                        ed.editorUPD();
                         return d;
                     }
 
@@ -341,6 +344,7 @@ finder_input.onkeydown = (e) => {
                 finder_dropup.appendChild(d);
             }
             finder_dropup.style.visibility = 'inherit';
+            ed.editorUPD();
         }, (err) => {show_error(err)})
     }
 };
